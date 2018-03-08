@@ -10,9 +10,6 @@
     "default_popup": "popup.html",
     "default_title": "Click here!"
   },
-  "permissions": [
-    "tabs", "http://www.google.com/*"
-  ],
   "content_scripts": [
     {
       "matches": ["http://www.google.com/*"],
@@ -21,7 +18,12 @@
     },
 	{
       "matches": ["https://p.eagate.573.jp/game/nostalgia/nst/playdata/entrance.html?k=music_data"],
-      "js": ["test.js"]
+      "js": ["test.js"],	
+	  "run_at": "document_start"
 	}
-  ]
+  ],
+  "background": {
+    "scripts": ["eventPage.js"],
+    "persistent": true
+  }
 }

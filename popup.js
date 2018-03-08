@@ -62,6 +62,14 @@ document.addEventListener('DOMContentLoaded', () => {
     var createButton = document.getElementById('create-button');
 	
 	createButton.addEventListener('click', () => {
+		
+	// 送信
+	chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+  chrome.tabs.sendMessage(tabs[0].id, {greeting: "hello"}, function(response) {
+    console.log(response.farewell);
+  });
+});
+		
 	  console.log('clicked createButton');
 		var musics = $(".cl_music_data");
 		musics.each(function() {
@@ -134,3 +142,17 @@ function calcRank(score) {
 		return "-";
 	}
 }
+
+function name() {
+	return 'popup';
+}
+
+window.addEventListener("message", function(event) {
+  // We only accept messages from ourselves
+  if (event.source != window)
+    return;
+
+  if (event.data.type && (event.data.type == "FROM_CONTENT")) {
+    console.log("うけとった: " + event.data.text);
+  }
+}, false);
