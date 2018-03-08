@@ -1,5 +1,5 @@
 
-console.log('test');
+console.log('testaaa');
 
 var musics = $(".cl_music_data");
 musics.each(function() {
