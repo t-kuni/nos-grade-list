@@ -65,8 +65,13 @@ document.addEventListener('DOMContentLoaded', () => {
 		
 	// 送信
 	chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-  chrome.tabs.sendMessage(tabs[0].id, {greeting: "hello"}, function(response) {
-    console.log(response.farewell);
+  chrome.tabs.sendMessage(tabs[0].id, {greeting: "hello"}, function(table) {
+	var ws = XLSX.utils.aoa_to_sheet(table);
+	var wb = XLSX.utils.book_new();
+	var wsName = "グレード表";
+	wb.SheetNames.push(wsName);
+	wb.Sheets[wsName] = ws;
+	XLSX.writeFile(wb, 'greads.xlsx');
   });
 });
 		
