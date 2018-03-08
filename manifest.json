@@ -11,12 +11,17 @@
     "default_title": "Click here!"
   },
   "permissions": [
-    "tabs", "https://p.eagate.573.jp/game/nostalgia/nst/playdata/entrance.html?k=music_data"
+    "tabs", "http://www.google.com/*"
   ],
   "content_scripts": [
     {
+      "matches": ["http://www.google.com/*"],
+      "js": ["jquery-3.3.1.min.js", "app.js"],
+	  "run_at": "document_start"
+    },
+	{
       "matches": ["https://p.eagate.573.jp/game/nostalgia/nst/playdata/entrance.html?k=music_data"],
-      "js": ["jquery-3.3.1.min.js", "app.js"]
-    }
+      "js": ["test.js"]
+	}
   ]
 }
