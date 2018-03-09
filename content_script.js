@@ -1,5 +1,3 @@
-alert('test');
-
 function getScore(seq, key) {
 	return $("[data-pdataMap~='music_list.music[" + seq + "].sheet[2]." + key + "']").text();
 }
