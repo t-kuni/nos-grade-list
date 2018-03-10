@@ -1,3 +1,4 @@
+
 function getScore(seq, key) {
 	return $("[data-pdataMap~='music_list.music[" + seq + "].sheet[2]." + key + "']").text();
 }
@@ -35,56 +36,55 @@ function calcRank(score) {
 }
 
 // 受信
-chrome.runtime.onMessage.addListener(
-    function(request, sender, sendResponse) {
-		if (request.greeting != "hello")
-			return;
-    
-		var musics = $(".cl_music_data");
-		var table = [[
-			"番号",
-			"曲名",
-			"難易度",
-			"スコア",
-			"ランク",
-			"ミス",
-			"コンボ",
-			"ノート数",
-			"伸びしろ",
-			"グレード",
-		]];
-		musics.each(function() {
-			var music = $(this);
-			var seq = music.find('.cl_music_data_seq').text();
-			
-			var title = music.find('.cl_music_data_title').text();
-			
-			if (!title) return;
-			
-			var level = getScore(seq, "level");
-			var score = parseInt(getScore(seq, "best_score"));
-			var rank = calcRank(score);
-			var miss = getScore(seq, "best_judge_miss");
-			var combo = parseInt(getScore(seq, "max_combo"));
-			var noteCount = getNoteCount(seq);
-			var nobi = noteCount - combo;
-			var grade = getScore(seq, "grade");
-			var grade = grade.substr(0, 2) + '.' + grade.substr(-2);
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+	if (request.greeting != "hello")
+		return;
+
+	var musics = $(".cl_music_data");
+	var table = [[
+		"番号",
+		"曲名",
+		"難易度",
+		"スコア",
+		"ランク",
+		"ミス",
+		"コンボ",
+		"ノート数",
+		"伸びしろ",
+		"グレード",
+	]];
+	musics.each(function() {
+		var music = $(this);
+		var seq = music.find('.cl_music_data_seq').text();
 		
-			var row = [
-				seq,
-				title,
-				level,
-				score,
-				rank,
-				miss,
-				combo,
-				noteCount,
-				nobi,
-				grade,
-			];
-			
-			table.push(row);
-		});
-        sendResponse(table);
-    });
+		var title = music.find('.cl_music_data_title').text();
+		
+		if (!title) return;
+		
+		var level = getScore(seq, "level");
+		var score = parseInt(getScore(seq, "best_score"));
+		var rank = calcRank(score);
+		var miss = getScore(seq, "best_judge_miss");
+		var combo = parseInt(getScore(seq, "max_combo"));
+		var noteCount = getNoteCount(seq);
+		var nobi = noteCount - combo;
+		var grade = getScore(seq, "grade");
+		var grade = grade.substr(0, 2) + '.' + grade.substr(-2);
+	
+		var row = [
+			seq,
+			title,
+			level,
+			score,
+			rank,
+			miss,
+			combo,
+			noteCount,
+			nobi,
+			grade,
+		];
+		
+		table.push(row);
+	});
+	sendResponse(table);
+});

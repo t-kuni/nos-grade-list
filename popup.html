@@ -7,23 +7,8 @@
 <html>
   <head>
     <title>Getting Started Extension's Popup</title>
-    <style type="text/css">
-      body {
-        margin: 10px;
-        white-space: nowrap;
-      }
-
-      h1 {
-        font-size: 15px;
-      }
-
-      #container {
-        align-items: center;
-        display: flex;
-        justify-content: space-between;
-      }
-    </style>
 	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     <!--
       - JavaScript and HTML must be in separate files: see our Content Security
@@ -31,23 +16,20 @@
       -
       - [1]: https://developer.chrome.com/extensions/contentSecurityPolicy
     -->
+	<link rel="stylesheet" href="bootstrap.min.css">
+	<script src="bootstrap.min.js"></script>
     <script src="xlsx.full.min.js"></script>
-    <script src="popup.js"></script>
-	
+	<script src="jquery-3.3.1.min.js"></script>
+    <script src="popup.js"></script>	
   </head>
 
-  <body>
-    <h1>Background Color Changer</h1>
-    <div id="container">
-      <span>Choose a color</span>
-      <select id="dropdown">
-        <option selected disabled hidden value=''></option>
-        <option value="white">White</option>
-        <option value="pink">Pink</option>
-        <option value="green">Green</option>
-        <option value="yellow">Yellow</option>
-      </select>
+  <body style="width: 300px;">
+	<div class="container-fluid">
+		<h5 class="">グレード表作成ツール</h5>
+		<h6 class=" mb-2 text-muted">ノスタルジアのグレード表(エクセル)を作成するツールです。</h6>
+		
+		<button class="btn btn-primary" id="move-btn">楽曲データページを開く</button>
+		<button class="btn btn-success" id="create-btn">グレード表作成</button>
     </div>
-	<button id="create-button">グレード表作成</button>
   </body>
 </html>

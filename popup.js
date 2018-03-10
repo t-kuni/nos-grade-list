@@ -1,4 +1,3 @@
-
 function getCurrentTabUrl(callback) {
   // Query filter to be passed to chrome.tabs.query - see
   // https://developer.chrome.com/extensions/tabs#method-query
@@ -41,9 +40,19 @@ function getCurrentTabUrl(callback) {
 document.addEventListener('DOMContentLoaded', () => {
 	
 	getCurrentTabUrl((url) => {
-		var createButton = document.getElementById('create-button');
+		var $moveBtn = $('#move-btn');
+		var $createBtn = $('#create-btn');
 		
-		createButton.addEventListener('click', onClickCreatingGradeList);
+		if (isMusicDataPage(url)) {
+			$moveBtn.hide();
+			$createBtn.show();
+		} else {
+			$moveBtn.show();
+			$createBtn.hide();
+		}
+		
+		$createBtn.click(onClickCreatingGradeList);
+		$moveBtn.click(() => {window.open('https://p.eagate.573.jp/game/nostalgia/nst/playdata/entrance.html?k=music_data');});
 	});
 });
 
@@ -59,4 +68,8 @@ function onClickCreatingGradeList() {
 			XLSX.writeFile(wb, 'greads.xlsx');
 		});
 	});
+}
+
+function isMusicDataPage(url) {
+	return url && url.match(/(p\.eagate\.573\.jp).*(entrance\.html\?k=music_data)/);
 }
