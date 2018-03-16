@@ -35,6 +35,10 @@ function calcRank(score) {
 	}
 }
 
+function insertStr(str, index, insert) {
+    return str.slice(0, index) + insert + str.slice(index, str.length);
+}
+
 // 受信
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 	if (request.greeting != "hello")
@@ -69,7 +73,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 		var noteCount = getNoteCount(seq);
 		var nobi = noteCount - combo;
 		var grade = getScore(seq, "grade");
-		var grade = grade.substr(0, 2) + '.' + grade.substr(-2);
+		var grade = insertStr(grade, grade.length - 2, '.');
 	
 		var row = [
 			seq,
