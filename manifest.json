@@ -1,9 +1,11 @@
 {
   "manifest_version": 2,
 
-  "name": "Getting started example",
-  "description": "This extension allows the user to change the background color of the current page.",
+  "name": "ノスタルジアグレード表作成ツール",
+  "short_name": "グレード表作成ツール",
+  "description": "ノスタルジアのグレード表を作成するツールです。公式サイトの楽曲データの情報を取得して作成します。",
   "version": "1.0",
+  "author": "ウェル",
 
   "browser_action": {
     "default_icon": "icon.png",
