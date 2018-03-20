@@ -53,8 +53,6 @@ document.addEventListener('DOMContentLoaded', () => {
 		
 		$createBtn.click(onClickCreatingGradeList);
 		$moveBtn.click(() => {window.open('https://p.eagate.573.jp/game/nostalgia/nst/playdata/entrance.html?k=music_data');});
-		
-		
 	});
 });
 
@@ -82,6 +80,10 @@ function setColType(ws, col, type) {
 
 // 「グレード表を作成」ボタンが押された
 function onClickCreatingGradeList() {
+	// UIを切り替え
+	$('#progress').show();
+	$('#create-btn').prop('disabled', true);
+
 	chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
 		chrome.tabs.sendMessage(tabs[0].id, {greeting: "hello"}, function(table) {
 			var ws = XLSX.utils.aoa_to_sheet(table);
@@ -91,6 +93,10 @@ function onClickCreatingGradeList() {
 			wb.SheetNames.push(wsName);
 			wb.Sheets[wsName] = ws;
 			XLSX.writeFile(wb, 'greads.xlsx');
+
+			// UIを切り替え
+			$('#progress').hide();
+			$('#create-btn').prop('disabled', false);
 		});
 	});
 }
