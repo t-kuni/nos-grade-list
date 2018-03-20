@@ -59,16 +59,16 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 	]];
 	musics.each(function() {
 		var music = $(this);
-		var seq = music.find('.cl_music_data_seq').text();
+		var seq = parseInt(music.find('.cl_music_data_seq').text());
 		
 		var title = music.find('.cl_music_data_title').text();
 		
 		if (!title) return;
 		
-		var level = getScore(seq, "level");
+		var level = parseInt(getScore(seq, "level"));
 		var score = parseInt(getScore(seq, "best_score"));
 		var rank = calcRank(score);
-		var miss = getScore(seq, "best_judge_miss");
+		var miss = parseInt(getScore(seq, "best_judge_miss"));
 		var combo = parseInt(getScore(seq, "max_combo"));
 		var noteCount = getNoteCount(seq);
 		var nobi = noteCount - combo;

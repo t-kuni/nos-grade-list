@@ -58,11 +58,34 @@ document.addEventListener('DOMContentLoaded', () => {
 	});
 });
 
+/**
+ * カラムのデータ形式を設定する
+ * @param {Worksheet} ws ワークシート
+ * @param {String} col 列名
+ * @param {String} type データ形式
+ */
+function setColType(ws, col, type) {
+	$.each(Object.keys(ws), function() {
+		var ref = this;
+		var match = ref.match(/^([A-Z]+)([0-9]+)$/)
+		if (!match)
+			return;
+
+		var colRef = match[1];
+		var rowRef = parseInt(match[2]);
+		// ヘッダーは対象外
+		if (rowRef > 1 && colRef == col) {
+			ws[ref].t = type;
+		}
+	});
+}
+
 // 「グレード表を作成」ボタンが押された
 function onClickCreatingGradeList() {
 	chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
 		chrome.tabs.sendMessage(tabs[0].id, {greeting: "hello"}, function(table) {
 			var ws = XLSX.utils.aoa_to_sheet(table);
+			setColType(ws, 'J', 'n');
 			var wb = XLSX.utils.book_new();
 			var wsName = "グレード表";
 			wb.SheetNames.push(wsName);
