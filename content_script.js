@@ -104,5 +104,14 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 		table[row][COL_GRADE+1] = row <= 50 ? "〇" : "-";
 	}
 
+	var maxGrade = table[1][COL_GRADE]; // 最大グレード
+	var minGrade = table[50][COL_GRADE]; // 下限グレード
+
+	table[0].push('');
+	table[0].push('最大グレード');
+	table[0].push(maxGrade);
+	table[0].push('下限グレード');
+	table[0].push(minGrade);
+
 	sendResponse(table);
 });
