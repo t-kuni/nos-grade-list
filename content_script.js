@@ -47,8 +47,10 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 		"ノート数",
 		"判定達成率",
 		"コンボ達成率",
-		"グレード",
-		"グレード対象",
+		"Grd",
+		"Grd対象",
+		"Sランク期待値",
+		"伸びしろ",
 	]];
 	musics.each(function() {
 		var music = $(this);
@@ -72,6 +74,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 		var comboRate = noteCount > 0 ? combo / noteCount : 0; // コンボ達成率
 		var grade = getScore(seq, "grade");
 		grade = insertStr(grade, grade.length - 2, '.');
+		var except = level * 7.25 * 1.5 * (0.85 * 0.95 + 0.15); // Sランク期待値（判定達成率 0.95 コンボ達成率 0.15 で計算）
 	
 		var row = [
 			seq,
@@ -86,12 +89,14 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 			comboRate,
 			grade,
 			'',
+			except,
 		];
 		
 		table.push(row);
 	});
 
 	// グレード列の番号
+	const COL_EXCEPT = 12;
 	const COL_GRADE = 10;
 
 	// グレードの降順に並べ替え
@@ -99,19 +104,30 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 		return parseFloat(b[COL_GRADE]) - parseFloat(a[COL_GRADE]);
 	});
 
-	// グレード対象かどうかを追加
-	for (var row = 1; row < table.length; row++) {
-		table[row][COL_GRADE+1] = row <= 50 ? "〇" : "-";
-	}
-
-	var maxGrade = table[1][COL_GRADE]; // 最大グレード
-	var minGrade = table[50][COL_GRADE]; // 下限グレード
+	var maxGrd = table[1][COL_GRADE]; // 最大グレード
+	var minGrd = table[Math.min(table.length, 50)][COL_GRADE]; // 下限グレード
 
 	table[0].push('');
-	table[0].push('最大グレード');
-	table[0].push(maxGrade);
-	table[0].push('下限グレード');
-	table[0].push(minGrade);
+	table[0].push('最大Grd');
+	table[0].push(maxGrd);
+	table[0].push('下限Grd');
+	table[0].push(minGrd);
+
+	for (var row = 1; row < table.length; row++) {
+
+		// グレード対象かどうか
+		var grdTarget = row <= 50;
+
+		// グレード対象かどうかを追加
+		table[row][COL_GRADE+1] = grdTarget ? "〇" : "-";
+
+		// 伸びしろ（SランクGrd期待値と下限Grdの差）を算出
+		var except = table[row][COL_EXCEPT];
+		var grd = table[row][COL_GRADE];
+		var nobi = parseFloat(except) - parseFloat(grdTarget ? grd :minGrd);
+		nobi = Math.max(nobi, 0); // 0以下は丸める
+		var except = table[row].push(nobi);
+	}
 
 	sendResponse(table);
 });
