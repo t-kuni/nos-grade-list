@@ -3,15 +3,6 @@ function getScore(seq, key) {
 	return $("[data-pdataMap~='music_list.music[" + seq + "].sheet[2]." + key + "']").text();
 }
 
-function getNoteCount(seq) {
-    var sjust = parseInt(getScore(seq, "best_judge_superjust"));
-    var just = parseInt(getScore(seq, "best_judge_just"));
-    var good = parseInt(getScore(seq, "best_judge_good"));
-    var miss = parseInt(getScore(seq, "best_judge_miss"));
-    var near = parseInt(getScore(seq, "best_judge_near"));
-	return sjust + just + good + miss + near;
-}
-
 function out(values) {
 	var buf = '';
 	$.each(values, function() {
@@ -48,12 +39,18 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 	var table = [[
 		"番号",
 		"曲名",
-		"難易度",
+		"レベル",
 		"スコア",
 		"ランク",
-		"ミス",
-		"コンボ",
+		"◆Just",
+		"Just",
+		"Good",
+		"Miss",
+		"Near",
+		"MaxCombo",
 		"ノート数",
+		"判定達成率",
+		"コンボ達成率",
 		"伸びしろ",
 		"グレード",
 	]];
@@ -68,12 +65,18 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 		var level = parseInt(getScore(seq, "level"));
 		var score = parseInt(getScore(seq, "best_score"));
 		var rank = calcRank(score);
+		var sjust = parseInt(getScore(seq, "best_judge_superjust"));
+		var just = parseInt(getScore(seq, "best_judge_just"));
+		var good = parseInt(getScore(seq, "best_judge_good"));
 		var miss = parseInt(getScore(seq, "best_judge_miss"));
+		var near = parseInt(getScore(seq, "best_judge_near"));
 		var combo = parseInt(getScore(seq, "max_combo"));
-		var noteCount = getNoteCount(seq);
+		var noteCount = sjust + just + good + miss + near; // 総ノート数
+		var judgeRate = (sjust + 0.5 * just + 0.25 * good) / noteCount; // 判定達成率
+		var comboRate = combo / noteCount; // コンボ達成率
 		var nobi = noteCount - combo;
 		var grade = getScore(seq, "grade");
-		var grade = insertStr(grade, grade.length - 2, '.');
+		grade = insertStr(grade, grade.length - 2, '.');
 	
 		var row = [
 			seq,
@@ -81,9 +84,15 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 			level,
 			score,
 			rank,
+			sjust,
+			just,
+			good,
 			miss,
+			near,
 			combo,
 			noteCount,
+			judgeRate,
+			comboRate,
 			nobi,
 			grade,
 		];
