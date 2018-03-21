@@ -74,6 +74,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 		"Grd対象",
 		"Grd期待値",
 		"伸びしろ",
+		"更新日時",
 	]];
 	musics.each(function() {
 		var music = $(this);
@@ -97,6 +98,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 		var comboRate = noteCount > 0 ? combo / noteCount : 0; // コンボ達成率
 		var grade = getScore(seq, "grade");
 		grade = insertStr(grade, grade.length - 2, '.');
+		var datetime =  getScore(seq, "best_time") + ":00";
 
 		const NOBI_RATE = 0.3; // 成長率(0～1)
 
@@ -119,8 +121,10 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 			judgeRate,
 			comboRate,
 			grade,
-			'',
-			except,
+			null, // Grd対象
+			except, // Grd期待値
+			null, // 伸びしろ
+			datetime,
 		];
 		
 		table.push(row);
@@ -155,9 +159,9 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 		// 伸びしろ（SランクGrd期待値と下限Grdの差）を算出
 		var except = table[row][COL_EXCEPT];
 		var grd = table[row][COL_GRADE];
-		var nobi = parseFloat(except) - parseFloat(grdTarget ? grd :minGrd);
+		var nobi = parseFloat(except) - parseFloat(grdTarget ? grd : minGrd);
 		nobi = Math.max(nobi, 0); // 0以下は丸める
-		var except = table[row].push(nobi);
+		table[row][COL_EXCEPT+1] = nobi;
 	}
 
 	sendResponse(table);

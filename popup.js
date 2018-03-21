@@ -109,6 +109,7 @@ function onClickCreatingGradeList() {
 	const COL_COMBO_RATE = 'J';
 	const COL_EXCEPT = 'M';
 	const COL_NOBI = 'N';
+	const COL_DATE = 'O';
 
 	chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
 		chrome.tabs.sendMessage(tabs[0].id, {greeting: "hello"}, function(table) {
@@ -119,8 +120,10 @@ function onClickCreatingGradeList() {
 			setColFormat(ws, COL_COMBO_RATE, '0%');
 			setColFormat(ws, COL_EXCEPT, '0.00');
 			setColFormat(ws, COL_NOBI, '0.00');
+			setColType(ws, COL_DATE, 'd');
+			setColFormat(ws, COL_DATE, 'm/d');
 			ws['!autofilter'] = {
-				ref: 'A1:N1'
+				ref: 'A1:O1'
 			};
 			var wb = XLSX.utils.book_new();
 			var wsName = "グレード表";
