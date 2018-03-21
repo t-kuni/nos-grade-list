@@ -104,15 +104,19 @@ function onClickCreatingGradeList() {
 	$('#progress').show();
 	$('#create-btn').prop('disabled', true);
 
+	const COL_GRADE = 'L';
+	const COL_JUDGE_RATE = 'I';
+	const COL_COMBO_RATE = 'J';
+
 	chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
 		chrome.tabs.sendMessage(tabs[0].id, {greeting: "hello"}, function(table) {
 			var ws = XLSX.utils.aoa_to_sheet(table);
-			setColType(ws, 'P', 'n');
-			setColFormat(ws, 'P', '0.00');
-			setColFormat(ws, 'M', '0%');
-			setColFormat(ws, 'N', '0%');
+			setColType(ws, COL_GRADE, 'n');
+			setColFormat(ws, COL_GRADE, '0.00');
+			setColFormat(ws, COL_JUDGE_RATE, '0%');
+			setColFormat(ws, COL_COMBO_RATE, '0%');
 			ws['!autofilter'] = {
-				ref: 'A1:Q1'
+				ref: 'A1:M1'
 			};
 			var wb = XLSX.utils.book_new();
 			var wsName = "グレード表";

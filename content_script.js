@@ -42,16 +42,12 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 		"レベル",
 		"スコア",
 		"ランク",
-		"◆Just",
-		"Just",
-		"Good",
 		"Miss",
-		"Near",
 		"MaxCombo",
 		"ノート数",
 		"判定達成率",
 		"コンボ達成率",
-		"伸びしろ",
+		"残コンボ",
 		"グレード",
 		"グレード対象",
 	]];
@@ -85,11 +81,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 			level,
 			score,
 			rank,
-			sjust,
-			just,
-			good,
 			miss,
-			near,
 			combo,
 			noteCount,
 			judgeRate,
@@ -102,14 +94,17 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 		table.push(row);
 	});
 
+	// グレード列の番号
+	const COL_GRADE = 11;
+
 	// グレードの降順に並べ替え
 	table.sort(function(a, b) {
-		return parseFloat(b[15]) - parseFloat(a[15]);
+		return parseFloat(b[COL_GRADE]) - parseFloat(a[COL_GRADE]);
 	});
 
 	// グレード対象かどうかを追加
 	for (var row = 1; row < table.length; row++) {
-		table[row][16] = row <= 50 ? "〇" : "-";
+		table[row][COL_GRADE+1] = row <= 50 ? "〇" : "-";
 	}
 
 	sendResponse(table);
