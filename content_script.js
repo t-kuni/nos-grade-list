@@ -53,6 +53,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 		"コンボ達成率",
 		"伸びしろ",
 		"グレード",
+		"グレード対象",
 	]];
 	musics.each(function() {
 		var music = $(this);
@@ -95,9 +96,21 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 			comboRate,
 			nobi,
 			grade,
+			'',
 		];
 		
 		table.push(row);
 	});
+
+	// グレードの降順に並べ替え
+	table.sort(function(a, b) {
+		return parseFloat(b[15]) - parseFloat(a[15]);
+	});
+
+	// グレード対象かどうかを追加
+	for (var row = 1; row < table.length; row++) {
+		table[row][16] = row <= 50 ? "〇" : "-";
+	}
+
 	sendResponse(table);
 });
