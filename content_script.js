@@ -15,15 +15,38 @@ function out(values) {
 }
 
 function calcRank(score) {
-	if (score >= 950000) {
+	if (score == 1000000) {
+		return "P";
+	} else if (score >= 950000) {
 		return "S";
 	} else if (score >= 900000) {
 		return "A+";
 	} else if (score >= 850000) {
 		return "A";
+	} else if (score >= 800000) {
+		return "B+";
+	} else if (score >= 750000) {
+		return "B";
+	} else if (score >= 700000) {
+		return "C";
 	} else {
 		return "-";
 	}
+}
+
+const RANK_RATE = {
+	"P" : 8.25,
+	"S" : 7.25,
+	"A+" : 6.5,
+	"A" : 5.75,
+	"B+" : 5.25,
+	"B" : 4.75,
+	"C" : 4.25,
+	"-" : 3.25,
+};
+
+function calcRankRate(score) {
+	return RANK_RATE[calcRank(score)];
 }
 
 function insertStr(str, index, insert) {
@@ -49,7 +72,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 		"コンボ達成率",
 		"Grd",
 		"Grd対象",
-		"Sランク期待値",
+		"Grd期待値",
 		"伸びしろ",
 	]];
 	musics.each(function() {
@@ -74,7 +97,15 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 		var comboRate = noteCount > 0 ? combo / noteCount : 0; // コンボ達成率
 		var grade = getScore(seq, "grade");
 		grade = insertStr(grade, grade.length - 2, '.');
-		var except = level * 7.25 * 1.5 * (0.85 * 0.95 + 0.15); // Sランク期待値（判定達成率 0.95 コンボ達成率 0.15 で計算）
+
+		const NOBI_RATE = 0.3; // 成長率(0～1)
+
+		// 目標スコア算出
+		var nobiJudge = Math.min((1- judgeRate) * NOBI_RATE + judgeRate, 1);
+		var nobiCombo = Math.min((1- comboRate) * NOBI_RATE + comboRate, 1);
+		var nobiScore = 1000000 * nobiJudge;
+		var nobiRankRate = calcRankRate(nobiScore);
+		var except = level * nobiRankRate * 1.5 * (0.85 * nobiJudge + 0.15 * nobiCombo); // 期待Grd
 	
 		var row = [
 			seq,
@@ -108,8 +139,8 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 	var minGrd = table[Math.min(table.length, 50)][COL_GRADE]; // 下限グレード
 
 	table[0].push('');
-	table[0].push('最大Grd');
-	table[0].push(maxGrd);
+	// table[0].push('最大Grd');
+	// table[0].push(maxGrd);
 	table[0].push('下限Grd');
 	table[0].push(minGrd);
 
