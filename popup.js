@@ -104,7 +104,7 @@ function onClickCreatingGradeList() {
 	$('#progress').show();
 	$('#create-btn').prop('disabled', true);
 
-	const COL_GRADE = 'L';
+	const COL_GRADE = 'K';
 	const COL_JUDGE_RATE = 'I';
 	const COL_COMBO_RATE = 'J';
 
@@ -116,7 +116,7 @@ function onClickCreatingGradeList() {
 			setColFormat(ws, COL_JUDGE_RATE, '0%');
 			setColFormat(ws, COL_COMBO_RATE, '0%');
 			ws['!autofilter'] = {
-				ref: 'A1:M1'
+				ref: 'A1:L1'
 			};
 			var wb = XLSX.utils.book_new();
 			var wsName = "グレード表";

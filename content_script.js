@@ -47,7 +47,6 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 		"ノート数",
 		"判定達成率",
 		"コンボ達成率",
-		"残コンボ",
 		"グレード",
 		"グレード対象",
 	]];
@@ -71,7 +70,6 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 		var noteCount = sjust + just + good + miss + near; // 総ノート数
 		var judgeRate = noteCount > 0 ? (sjust + 0.5 * just + 0.25 * good) / noteCount : 0; // 判定達成率
 		var comboRate = noteCount > 0 ? combo / noteCount : 0; // コンボ達成率
-		var nobi = noteCount - combo;
 		var grade = getScore(seq, "grade");
 		grade = insertStr(grade, grade.length - 2, '.');
 	
@@ -86,7 +84,6 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 			noteCount,
 			judgeRate,
 			comboRate,
-			nobi,
 			grade,
 			'',
 		];
@@ -95,7 +92,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 	});
 
 	// グレード列の番号
-	const COL_GRADE = 11;
+	const COL_GRADE = 10;
 
 	// グレードの降順に並べ替え
 	table.sort(function(a, b) {
