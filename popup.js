@@ -58,11 +58,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
 /**
  * カラムのデータ形式を設定する
- * @param {Worksheet} ws ワークシート
- * @param {String} col 列名
- * @param {String} type データ形式
  */
 function setColType(ws, col, type) {
+	editCol(ws, col, function(ws, colRef, rowRef, cell) {
+		cell.t = type;
+		return cell;
+	});
+}
+
+/**
+ * カラムの書式を設定する
+ */
+function setColFormat(ws, col, format) {
+	editCol(ws, col, function(ws, colRef, rowRef, cell) {
+		cell.z = format;
+		return cell;
+	});
+}
+
+/**
+ * 指定した列のセルをまとめて編集する
+ * @param {Worksheet} ws ワークシート
+ * @param {String} col 列名
+ * @param {Function} callback コールバック
+ */
+function editCol(ws, col, callback) {
 	$.each(Object.keys(ws), function() {
 		var ref = this;
 		var match = ref.match(/^([A-Z]+)([0-9]+)$/)
@@ -73,7 +93,7 @@ function setColType(ws, col, type) {
 		var rowRef = parseInt(match[2]);
 		// ヘッダーは対象外
 		if (rowRef > 1 && colRef == col) {
-			ws[ref].t = type;
+			ws[ref] = callback(ws, colRef, rowRef, ws[ref]);
 		}
 	});
 }
@@ -88,6 +108,9 @@ function onClickCreatingGradeList() {
 		chrome.tabs.sendMessage(tabs[0].id, {greeting: "hello"}, function(table) {
 			var ws = XLSX.utils.aoa_to_sheet(table);
 			setColType(ws, 'P', 'n');
+			setColFormat(ws, 'P', '0.00');
+			setColFormat(ws, 'M', '0%');
+			setColFormat(ws, 'N', '0%');
 			var wb = XLSX.utils.book_new();
 			var wsName = "グレード表";
 			wb.SheetNames.push(wsName);
