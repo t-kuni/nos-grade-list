@@ -111,6 +111,9 @@ function onClickCreatingGradeList() {
 			setColFormat(ws, 'P', '0.00');
 			setColFormat(ws, 'M', '0%');
 			setColFormat(ws, 'N', '0%');
+			ws['!autofilter'] = {
+				ref: 'A1:Q1'
+			};
 			var wb = XLSX.utils.book_new();
 			var wsName = "グレード表";
 			wb.SheetNames.push(wsName);
