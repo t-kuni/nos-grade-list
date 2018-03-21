@@ -72,8 +72,8 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 		var near = parseInt(getScore(seq, "best_judge_near"));
 		var combo = parseInt(getScore(seq, "max_combo"));
 		var noteCount = sjust + just + good + miss + near; // 総ノート数
-		var judgeRate = (sjust + 0.5 * just + 0.25 * good) / noteCount; // 判定達成率
-		var comboRate = combo / noteCount; // コンボ達成率
+		var judgeRate = noteCount > 0 ? (sjust + 0.5 * just + 0.25 * good) / noteCount : 0; // 判定達成率
+		var comboRate = noteCount > 0 ? combo / noteCount : 0; // コンボ達成率
 		var nobi = noteCount - combo;
 		var grade = getScore(seq, "grade");
 		grade = insertStr(grade, grade.length - 2, '.');
