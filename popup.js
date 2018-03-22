@@ -98,6 +98,124 @@ function editCol(ws, col, callback) {
 	});
 }
 
+function calcRank(score) {
+	if (score == 1000000) {
+		return "P";
+	} else if (score >= 950000) {
+		return "S";
+	} else if (score >= 900000) {
+		return "A+";
+	} else if (score >= 850000) {
+		return "A";
+	} else if (score >= 800000) {
+		return "B+";
+	} else if (score >= 750000) {
+		return "B";
+	} else if (score >= 700000) {
+		return "C";
+	} else {
+		return "-";
+	}
+}
+
+function calcRankRate(score) {
+	return RANK_RATE[calcRank(score)];
+}
+
+const RANK_RATE = {
+	"P" : 8.25,
+	"S" : 7.25,
+	"A+" : 6.5,
+	"A" : 5.75,
+	"B+" : 5.25,
+	"B" : 4.75,
+	"C" : 4.25,
+	"-" : 3.25,
+};
+
+const COL_DEFINE = [
+	{
+		headerText: "番号",
+		dataIndex: "seq", 
+	},
+	{
+		headerText: "曲名",
+		dataIndex: "title", 
+	},
+	{
+		headerText: "レベル",
+		dataIndex: "level", 
+	},
+	{
+		headerText: "スコア",
+		dataIndex: "score", 
+	},
+	{
+		headerText: "ランク",
+		dataIndex: "rank", 
+	},
+	{
+		headerText: "Miss",
+		dataIndex: "miss", 
+	},
+	{
+		headerText: "MaxCombo",
+		dataIndex: "combo", 
+	},
+	{
+		headerText: "ノート数",
+		dataIndex: "noteCount", 
+	},
+	{
+		headerText: "判定達成率",
+		dataIndex: "judgeRate", 
+		format: '0%',
+	},
+	{
+		headerText: "コンボ達成率",
+		dataIndex: "comboRate", 
+		format: '0%',
+	},
+	{
+		headerText: "Grd",
+		dataIndex: "grade", 
+		type: 'n',
+		format: '0.00',
+	},
+	{
+		headerText: "Grd対象",
+		dataIndex: "grdTarget", 
+	},
+	{
+		headerText: "Grd期待値",
+		dataIndex: "nobiGrade", 
+		type: 'n',
+		format: '0.00',
+	},
+	{
+		headerText: "判定期待値",
+		dataIndex: "nobiJudge", 
+		format: '0%',
+	},
+	{
+		headerText: "コンボ期待値",
+		dataIndex: "nobiCombo", 
+		format: '0%',
+	},
+	{
+		headerText: "伸びしろ",
+		dataIndex: "nobi", 
+		type: 'n',
+		format: '0.00',
+	},
+	{
+		headerText: "更新日時",
+		dataIndex: "datetime", 
+		type: 'd',
+		format: 'm/d',
+	},
+];
+
 // 「グレード表を作成」ボタンが押された
 function onClickCreatingGradeList() {
 	// UIを切り替え
@@ -112,19 +230,112 @@ function onClickCreatingGradeList() {
 	const COL_DATE = 'O';
 
 	chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-		chrome.tabs.sendMessage(tabs[0].id, {greeting: "hello"}, function(table) {
-			var ws = XLSX.utils.aoa_to_sheet(table);
-			setColType(ws, COL_GRADE, 'n');
-			setColFormat(ws, COL_GRADE, '0.00');
-			setColFormat(ws, COL_JUDGE_RATE, '0%');
-			setColFormat(ws, COL_COMBO_RATE, '0%');
-			setColFormat(ws, COL_EXCEPT, '0.00');
-			setColFormat(ws, COL_NOBI, '0.00');
-			setColType(ws, COL_DATE, 'd');
-			setColFormat(ws, COL_DATE, 'm/d');
+		chrome.tabs.sendMessage(tabs[0].id, {greeting: "hello"}, function(resultList) {
+
+			// グレードの降順に並べ替え
+			resultList.sort(function(a, b) {
+				return parseFloat(b.grade) - parseFloat(a.grade);
+			});
+		
+			var maxGrd = resultList[0].grade; // 最大グレード
+			var minGrd = resultList[Math.min(resultList.length, 49)].grade; // 下限グレード
+
+			$.each(resultList, function(index) {
+				var r = this;
+
+				var sjust = r.sjust;
+				var just = r.just;
+				var good = r.good;
+				var miss = r.miss;
+				var near = r.near;
+				var combo = r.combo;
+
+				var noteCount = sjust + just + good + miss + near; // 総ノート数
+				var judgeRate = noteCount > 0 ? (sjust + 0.5 * just + 0.25 * good) / noteCount : 0; // 判定達成率
+				var comboRate = noteCount > 0 ? combo / noteCount : 0; // コンボ達成率
+
+				r.noteCount = noteCount;
+				r.judgeRate = judgeRate;
+				r.comboRate = comboRate;
+				
+				const NOBI_RATE = 0.3; // 成長率(0～1)
+
+				var level = r.level;
+
+				// 目標スコア算出
+				var nobiJudge = Math.min((1- judgeRate) * NOBI_RATE + judgeRate, 1);
+				var nobiCombo = Math.min((1- comboRate) * NOBI_RATE + comboRate, 1);
+				var nobiScore = 1000000 * nobiJudge; // スコアの計算式不明。テヌートやトリルがあるのでグレードより誤差が出やすい（？）
+				var nobiRankRate = Math.max(calcRankRate(nobiScore), calcRankRate(r.score)); // 現状のランクより下がらない様にする
+				var nobiGrade = level * nobiRankRate * 1.5 * (0.85 * nobiJudge + 0.15 * nobiCombo); // 期待Grd
+
+				r.nobiJudge = nobiJudge;
+				r.nobiCombo = nobiCombo;
+				r.nobiScore = nobiScore;
+				r.nobiRankRate = nobiRankRate;
+				r.nobiGrade = nobiGrade;
+
+				// グレード対象かどうか
+				var grdTarget = index < 50;
+		
+				// 伸びしろ（Grd期待値と下限Grdの差）を算出
+				var grd = r.grade;
+				var nobi = parseFloat(nobiGrade) - parseFloat(grdTarget ? grd : minGrd);
+				nobi = Math.max(nobi, 0); // 0以下は丸める
+
+				r.grdTarget = grdTarget ? "〇" : "-";
+				r.nobi = nobi;
+			});
+
+			// 2次元配列に変換
+			var tableAry = $.map(resultList, function(r) {
+				var row = $.map(COL_DEFINE, function(col) {
+					return r[col.dataIndex];
+				});
+				return [row]; // さらに配列で包まないと1次元配列になってしまう
+			});
+
+			// ヘッダー行作成
+			var header = $.map(COL_DEFINE, function(col) {
+				return col.headerText;
+			});
+
+			tableAry.unshift(header);
+
+			tableAry[0].push('');
+			tableAry[0].push('下限Grd');
+			tableAry[0].push(minGrd);
+
+			var ws = XLSX.utils.aoa_to_sheet(tableAry);
+
+			var endRow = XLSX.utils.decode_range(ws["!ref"]).e.r;
+
+			$.each(COL_DEFINE, function(colNo) {
+				for (var rowNo = 1; rowNo < endRow; rowNo++) {
+					var cellRef = XLSX.utils.encode_cell({c:colNo, r:rowNo})
+					var cell = ws[cellRef];
+
+					var type = this.type;
+					var fmt = this.format;
+
+					if (type) cell.t = type;
+					if (fmt) cell.z = fmt;
+				}
+			});
+
 			ws['!autofilter'] = {
-				ref: 'A1:O1'
+				ref: XLSX.utils.encode_range({
+					s: {
+						c: 0, 
+						r: 0,
+					},
+					e: {
+						c: COL_DEFINE.length - 1,
+						r: 0,
+					}
+				})
 			};
+
 			var wb = XLSX.utils.book_new();
 			var wsName = "グレード表";
 			wb.SheetNames.push(wsName);
