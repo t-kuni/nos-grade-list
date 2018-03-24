@@ -187,24 +187,6 @@ const COL_DEFINE = [
 		dataIndex: "grdTarget", 
 	},
 	{
-		headerText: "スコア期待値",
-		dataIndex: "nobiScore", 
-		type: 'n',
-		format: '0',
-	},
-	{
-		headerText: "判定期待値",
-		dataIndex: "nobiJudge", 
-		type: 'n',
-		format: '0%',
-	},
-	{
-		headerText: "コンボ期待値",
-		dataIndex: "nobiCombo", 
-		type: 'n',
-		format: '0%',
-	},
-	{
 		headerText: "Grd期待値",
 		dataIndex: "nobiGrade", 
 		type: 'n',
