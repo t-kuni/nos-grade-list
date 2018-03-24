@@ -187,6 +187,24 @@ const COL_DEFINE = [
 		dataIndex: "grdTarget", 
 	},
 	{
+		headerText: "スコア期待値",
+		dataIndex: "nobiScore", 
+		type: 'n',
+		format: '0',
+	},
+	{
+		headerText: "判定期待値",
+		dataIndex: "nobiJudge", 
+		type: 'n',
+		format: '0%',
+	},
+	{
+		headerText: "コンボ期待値",
+		dataIndex: "nobiCombo", 
+		type: 'n',
+		format: '0%',
+	},
+	{
 		headerText: "Grd期待値",
 		dataIndex: "nobiGrade", 
 		type: 'n',
@@ -252,19 +270,28 @@ function onClickCreatingGradeList() {
 
 				// 目標スコア算出
 				const NOBI_MISS = 2;
-				const NOBI_JUDGE = 15;
+				const NOBI_JUST = calcIncNobiNote("just", miss, judgeRate, noteCount);
+				const NOBI_GOOD = calcIncNobiNote("good", miss, judgeRate, noteCount);
+				const NOBI_NEAR = calcIncNobiNote("near", miss, judgeRate, noteCount);
+
 				var amari = NOBI_MISS;
 				var nobiMiss = Math.max(miss - amari, 0);
 				var diff = Math.min(miss, amari); // Missを減らした数
 				amari = amari - diff;
 
-				amari = amari + NOBI_JUDGE;
+				amari = amari + NOBI_NEAR;
+				var nobiNear = near + diff;
+				diff = Math.min(nobiNear, amari);
+				nobiNear = Math.max(nobiNear - amari, 0);
+				amari = amari - diff;
 
+				amari = amari + NOBI_GOOD;
 				var nobiGood = good + diff;
 				diff = Math.min(nobiGood, amari);
 				nobiGood = Math.max(nobiGood - amari, 0);
 				amari = amari - diff;
 
+				amari = amari + NOBI_JUST;
 				var nobiJust = just + diff;
 				diff = Math.min(nobiJust, amari);
 				nobiJust = Math.max(nobiJust - amari, 0);
@@ -368,6 +395,23 @@ function calcIncComboRate(miss, comboRate) {
 	var inc = 0.4355 / (1.15 * miss);
 
 	return Math.min(1, comboRate + inc);
+}
+
+function calcIncNobiNote(judge, miss, judgeRate, noteCount) {
+	var ratio = 1;
+	switch (judge) {
+		case "just":
+			ratio = 0.2;
+			break;
+		case "good":
+			ratio = 0.3;
+			break;
+		case "near":
+			ratio = 0.5;
+			break;
+	}
+	var nobiRate = (1 - judgeRate) * 0.5 * ratio;
+	return Math.round(noteCount * nobiRate);
 }
 
 function isMusicDataPage(url) {
