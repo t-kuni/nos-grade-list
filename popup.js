@@ -348,7 +348,7 @@ function onClickCreatingGradeList() {
 			var endRow = XLSX.utils.decode_range(ws["!ref"]).e.r;
 
 			$.each(COL_DEFINE, function(colNo) {
-				for (var rowNo = 1; rowNo < endRow; rowNo++) {
+				for (var rowNo = 1; rowNo <= endRow; rowNo++) {
 					var cellRef = XLSX.utils.encode_cell({c:colNo, r:rowNo})
 					var cell = ws[cellRef];
 
