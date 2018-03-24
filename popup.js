@@ -193,17 +193,7 @@ const COL_DEFINE = [
 		format: '0.00',
 	},
 	{
-		headerText: "判定期待値",
-		dataIndex: "nobiJudge", 
-		format: '0%',
-	},
-	{
-		headerText: "コンボ期待値",
-		dataIndex: "nobiCombo", 
-		format: '0%',
-	},
-	{
-		headerText: "伸びしろ",
+		headerText: "Grd伸び期待値",
 		dataIndex: "nobi", 
 		type: 'n',
 		format: '0.00',
@@ -257,16 +247,36 @@ function onClickCreatingGradeList() {
 				r.noteCount = noteCount;
 				r.judgeRate = judgeRate;
 				r.comboRate = comboRate;
-				
-				const NOBI_RATE = 0.3; // 成長率(0～1)
 
 				var level = r.level;
 
 				// 目標スコア算出
-				var nobiJudge = Math.min((1- judgeRate) * NOBI_RATE + judgeRate, 1);
-				var nobiCombo = Math.min((1- comboRate) * NOBI_RATE + comboRate, 1);
-				var nobiScore = 1000000 * nobiJudge; // スコアの計算式不明。テヌートやトリルがあるのでグレードより誤差が出やすい（？）
-				var nobiRankRate = Math.max(calcRankRate(nobiScore), calcRankRate(r.score)); // 現状のランクより下がらない様にする
+				const NOBI_MISS = 2;
+				const NOBI_JUDGE = 15;
+				var amari = NOBI_MISS;
+				var nobiMiss = Math.max(miss - amari, 0);
+				var diff = Math.min(miss, amari); // Missを減らした数
+				amari = amari - diff;
+
+				amari = amari + NOBI_JUDGE;
+
+				var nobiGood = good + diff;
+				diff = Math.min(nobiGood, amari);
+				nobiGood = Math.max(nobiGood - amari, 0);
+				amari = amari - diff;
+
+				var nobiJust = just + diff;
+				diff = Math.min(nobiJust, amari);
+				nobiJust = Math.max(nobiJust - amari, 0);
+				amari = amari - diff;
+
+				var nobiSJust = sjust + diff;
+				nobiSJust = Math.max(nobiSJust - amari, 0);
+				
+				var nobiJudge = noteCount > 0 ? (nobiSJust + 0.5 * nobiJust + 0.25 * nobiGood) / noteCount : 0;
+				var nobiCombo = calcIncComboRate(miss, comboRate);
+				var nobiScore = noteCount > 0 ? 1000000 * ((nobiSJust + 0.7 * nobiJust + 0.5 * nobiGood) / noteCount) : 0;
+				var nobiRankRate = calcRankRate(nobiScore);
 				var nobiGrade = level * nobiRankRate * 1.5 * (0.85 * nobiJudge + 0.15 * nobiCombo); // 期待Grd
 
 				r.nobiJudge = nobiJudge;
@@ -347,6 +357,17 @@ function onClickCreatingGradeList() {
 			$('#create-btn').prop('disabled', false);
 		});
 	});
+}
+
+// ミス数が2減った時のコンボ達成率を取得します
+function calcIncComboRate(miss, comboRate) {
+	if (miss <= 2) {
+		return 1;
+	}
+
+	var inc = 0.4355 / (1.15 * miss);
+
+	return Math.min(1, comboRate + inc);
 }
 
 function isMusicDataPage(url) {
