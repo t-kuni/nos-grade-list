@@ -8084,6 +8084,37 @@ function write_fills(fills) {
 	o[o.length] = ("</fills>");
 	return o.join("");
 }
+function parse_border(border) {
+	var top, right, bottom, left;
+	[top, right, bottom, left] = border.trim().split(" ");
+	return {
+		top: top == "1",
+		right: right == "1",
+		bottom: bottom == "1",
+		left: left == "1"
+	};
+}
+function make_border_xml(tagName) {
+	return '<' + tagName + ' style="thin"><color indexed="64"/></' + tagName + '>';
+}
+function write_borders(borders) {
+	var len = borders.length;
+	var o = ['<borders count="' + len + '">'];
+	// デフォルトのボーダーを設定する
+	o[o.length] = '<border><left/><right/><top/><bottom/><diagonal/></border>';
+	for (var i = 1; i < len; i++) { // デフォルトのボーダーがあるので1始まり
+		var border = parse_border(borders[i]);
+		o[o.length] = ("<border>");
+		if (border.left) o[o.length] = make_border_xml('left');
+		if (border.right) o[o.length] = make_border_xml('right');
+		if (border.top) o[o.length] = make_border_xml('top');
+		if (border.bottom) o[o.length] = make_border_xml('bottom');
+		o[o.length] = "<diagonal/>";
+		o[o.length] = ("</border>");
+	}
+	o[o.length] = ("</borders>");
+	return o.join("");
+}
 
 RELS.STY = "http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles";
 
@@ -8092,7 +8123,7 @@ function write_sty_xml(wb, opts) {
 	if(wb.SSF && (w = write_numFmts(wb.SSF)) != null) o[o.length] = w;
 	o[o.length] = ('<fonts count="1"><font><sz val="12"/><color theme="1"/><name val="Calibri"/><family val="2"/><scheme val="minor"/></font></fonts>');
 	if(wb.FILLS && (w = write_fills(wb.FILLS)) != null) o[o.length] = w;
-	o[o.length] = ('<borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders>');
+	if(wb.BORDERS && (w = write_borders(wb.BORDERS)) != null) o[o.length] = w;
 	o[o.length] = ('<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>');
 	if((w = write_cellXfs(opts.cellXfs))) o[o.length] = (w);
 	o[o.length] = ('<cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles>');
@@ -11786,17 +11817,24 @@ function get_cell_style(styles, cell, opts) {
 			break;
 		}
 	}
+	// 背景色
 	var rgb = 'bg' in cell ? cell.bg : null;
 	var f = 0;
 	if ('FILLS' in opts) {
 		f = find_fill(opts.FILLS, rgb);
 	}
-	for(i = 0; i != len; ++i) if(styles[i].numFmtId === z && styles[i].fillId === f) return i;
+	// ボーダー
+	var border = 'border' in cell ? cell.border : null;
+	var b = 0;
+	if ('BORDERS' in opts) {
+		b = find_border(opts.BORDERS, border);
+	}
+	for(i = 0; i != len; ++i) if(styles[i].numFmtId === z && styles[i].fillId === f && styles[i].borderId === b) return i;
 	styles[len] = {
 		numFmtId:z,
 		fontId:0,
 		fillId:f,
-		borderId:0,
+		borderId:b,
 		xfId:0,
 		applyNumberFormat:1
 	};
@@ -19056,6 +19094,40 @@ function make_fills(ws) {
 	}
 	return fills;
 }
+
+/**
+ * borderの配列から一致するborderの添え字番号を返す
+ * 一致しない場合はnullを返す
+ */
+function find_border(borders, border) {
+	var len = borders.length;
+	for (var i = 0; i < len; i++) {
+		if (borders[i] == border) {
+			return i;
+		}
+	}
+	return null;
+}
+
+function make_borders(ws) {
+	/**
+	 * bordersの初期化
+	 * 1番目の要素はボーダー無し扱いでnullを入れる
+	 */
+	var borders = [null];
+	var ref = XLSX.utils.decode_range(ws["!ref"]);
+	for (var col = ref.s.c; col < ref.e.c; col++) {
+		for (var row = ref.s.r; row < ref.e.r; row++) {
+			var cell = ws[XLSX.utils.encode_cell({c:col, r:row})];
+			if (cell && 'border' in cell) {
+				if (find_border(borders, cell.border) == null) {
+					borders.push(cell.border);
+				}
+			}
+		}
+	}
+	return borders;
+}
 function write_zip(wb, opts) {
 	_shapeid = 1024;
 	if(opts.bookType == "ods") return write_ods(wb, opts);
@@ -19071,6 +19143,10 @@ function write_zip(wb, opts) {
 	if(!wb.FILLS) {
 		wb.FILLS = make_fills(wb.Sheets['グレード表']);
 		opts.FILLS = wb.FILLS;
+	}
+	if(!wb.BORDERS) {
+		wb.BORDERS = make_borders(wb.Sheets['グレード表']);
+		opts.BORDERS = wb.BORDERS;
 	}
 	opts.rels = {}; opts.wbrels = {};
 	opts.Strings = []; opts.Strings.Count = 0; opts.Strings.Unique = 0;
