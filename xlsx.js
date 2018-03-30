@@ -8066,13 +8066,32 @@ var STYLES_XML_ROOT = writextag('styleSheet', null, {
 	'xmlns:vt': XMLNS.vt
 });
 
+function write_fills(fills) {
+	var len = fills.length;
+	var o = ['<fills count="' + len + '">'];
+	// デフォルトの背景色２つを設定する
+	o[o.length] = '<fill><patternFill patternType="none"/></fill>';
+	o[o.length] = '<fill><patternFill patternType="gray125"/></fill>';
+	for (var i = 2; i < len; i++) { // 背景色無しがあるので1始まり
+		var rgb = fills[i];
+		o[o.length] = ("<fill>");
+		o[o.length] = '<patternFill patternType="solid">';
+		o[o.length] = writextag('fgColor',null,{rgb:escapexml(rgb)});
+		o[o.length] = writextag('bgColor',null,{indexed:64});
+		o[o.length] = '</patternFill>';
+		o[o.length] = ("</fill>");
+	}
+	o[o.length] = ("</fills>");
+	return o.join("");
+}
+
 RELS.STY = "http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles";
 
 function write_sty_xml(wb, opts) {
 	var o = [XML_HEADER, STYLES_XML_ROOT], w;
 	if(wb.SSF && (w = write_numFmts(wb.SSF)) != null) o[o.length] = w;
 	o[o.length] = ('<fonts count="1"><font><sz val="12"/><color theme="1"/><name val="Calibri"/><family val="2"/><scheme val="minor"/></font></fonts>');
-	o[o.length] = ('<fills count="2"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill></fills>');
+	if(wb.FILLS && (w = write_fills(wb.FILLS)) != null) o[o.length] = w;
 	o[o.length] = ('<borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders>');
 	o[o.length] = ('<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>');
 	if((w = write_cellXfs(opts.cellXfs))) o[o.length] = (w);
@@ -11767,11 +11786,16 @@ function get_cell_style(styles, cell, opts) {
 			break;
 		}
 	}
-	for(i = 0; i != len; ++i) if(styles[i].numFmtId === z) return i;
+	var rgb = 'bg' in cell ? cell.bg : null;
+	var f = 0;
+	if ('FILLS' in opts) {
+		f = find_fill(opts.FILLS, rgb);
+	}
+	for(i = 0; i != len; ++i) if(styles[i].numFmtId === z && styles[i].fillId === f) return i;
 	styles[len] = {
 		numFmtId:z,
 		fontId:0,
-		fillId:0,
+		fillId:f,
 		borderId:0,
 		xfId:0,
 		applyNumberFormat:1
@@ -18999,6 +19023,39 @@ if(einfo[0] == 0x02 && typeof decrypt_std76 !== 'undefined') return decrypt_std7
 	throw new Error("File is password-protected");
 }
 
+/**
+ * fillの配列から一致するrgbの添え字番号を返す
+ * 一致しない場合はnullを返す
+ */
+function find_fill(fills, rgb) {
+	var len = fills.length;
+	for (var i = 0; i < len; i++) {
+		if (fills[i] == rgb) {
+			return i;
+		}
+	}
+	return null;
+}
+function make_fills(ws) {
+	/**
+	 * fillsの初期化
+	 * 1番目の要素は背景色無し扱いでnullを入れる
+	 * 2番目の要素はなぜか必要なpatternType="gray125"用にnullを入れておく
+	 */
+	var fills = [null, null];
+	var ref = XLSX.utils.decode_range(ws["!ref"]);
+	for (var col = ref.s.c; col < ref.e.c; col++) {
+		for (var row = ref.s.r; row < ref.e.r; row++) {
+			var cell = ws[XLSX.utils.encode_cell({c:col, r:row})];
+			if (cell && 'bg' in cell) {
+				if (find_fill(fills, cell.bg) == null) {
+					fills.push(cell.bg);
+				}
+			}
+		}
+	}
+	return fills;
+}
 function write_zip(wb, opts) {
 	_shapeid = 1024;
 	if(opts.bookType == "ods") return write_ods(wb, opts);
@@ -19010,6 +19067,10 @@ function write_zip(wb, opts) {
 		// $FlowIgnore
 		opts.revssf = evert_num(wb.SSF); opts.revssf[wb.SSF[65535]] = 0;
 		opts.ssf = wb.SSF;
+	}
+	if(!wb.FILLS) {
+		wb.FILLS = make_fills(wb.Sheets['グレード表']);
+		opts.FILLS = wb.FILLS;
 	}
 	opts.rels = {}; opts.wbrels = {};
 	opts.Strings = []; opts.Strings.Count = 0; opts.Strings.Unique = 0;
