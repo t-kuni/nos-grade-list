@@ -345,7 +345,7 @@ function onClickCreatingGradeList() {
 			var line1 = [];
 			var line2 = [];
 			$.each(COL_DEFINE, function(gIdx, group) {
-
+				
 				$.each(group.columns, function(cIdx, column) {
 					if (cIdx == 0) line1.push(group.title);
 					else line1.push("");
@@ -367,9 +367,19 @@ function onClickCreatingGradeList() {
 			var colNo = 0;
 			$.each(COL_DEFINE, function() {
 				var group = this;
+				var bgColor = group.bgColor;
 				$.each(group.columns, function() {
+
+					// ヘッダー部分を処理
+					for (var rowNo = 0; rowNo < 2; rowNo++) {
+						var cellRef = XLSX.utils.encode_cell({c:colNo, r:rowNo});
+						var cell = ws[cellRef];
+						cell.bg = bgColor;
+					}
+
+					// ボディ部分を処理
 					for (var rowNo = 2; rowNo <= endRow; rowNo++) {
-						var cellRef = XLSX.utils.encode_cell({c:colNo, r:rowNo})
+						var cellRef = XLSX.utils.encode_cell({c:colNo, r:rowNo});
 						var cell = ws[cellRef];
 	
 						var type = this.type;
@@ -386,11 +396,11 @@ function onClickCreatingGradeList() {
 				ref: XLSX.utils.encode_range({
 					s: {
 						c: 0, 
-						r: 0,
+						r: 1,
 					},
 					e: {
 						c: COL_DEFINE.length - 1,
-						r: 0,
+						r: 1,
 					}
 				})
 			};
