@@ -135,75 +135,99 @@ const RANK_RATE = {
 
 const COL_DEFINE = [
 	{
-		headerText: "番号",
-		dataIndex: "seq", 
+		title: "曲情報",
+		bgColor: "FFFF0000",
+		columns: [
+			{
+				headerText: "番号",
+				dataIndex: "seq", 
+			},
+			{
+				headerText: "曲名",
+				dataIndex: "title", 
+			},
+			{
+				headerText: "レベル",
+				dataIndex: "level", 
+			},
+		]
 	},
 	{
-		headerText: "曲名",
-		dataIndex: "title", 
+		title: "ベストスコア",
+		bgColor: "FFFFFF00",
+		columns: [
+			{
+				headerText: "スコア",
+				dataIndex: "score", 
+			},
+			{
+				headerText: "ランク",
+				dataIndex: "rank", 
+			},
+			{
+				headerText: "Miss",
+				dataIndex: "miss", 
+			},
+			{
+				headerText: "MaxCombo",
+				dataIndex: "combo", 
+			},
+			{
+				headerText: "ノート数",
+				dataIndex: "noteCount", 
+			},
+			{
+				headerText: "Grd",
+				dataIndex: "grade", 
+				type: 'n',
+				format: '0.00',
+			},
+			{
+				headerText: "更新日時",
+				dataIndex: "datetime", 
+				type: 'd',
+				format: 'm/d',
+			},
+		]
 	},
 	{
-		headerText: "レベル",
-		dataIndex: "level", 
+		title: "追加情報",
+		bgColor: "FF00FF00",
+		columns: [
+			{
+				headerText: "判定達成率",
+				dataIndex: "judgeRate", 
+				format: '0%',
+			},
+			{
+				headerText: "コンボ達成率",
+				dataIndex: "comboRate", 
+				format: '0%',
+			},
+			{
+				headerText: "Grd対象",
+				dataIndex: "grdTarget", 
+			},
+		]
 	},
 	{
-		headerText: "スコア",
-		dataIndex: "score", 
-	},
-	{
-		headerText: "ランク",
-		dataIndex: "rank", 
-	},
-	{
-		headerText: "Miss",
-		dataIndex: "miss", 
-	},
-	{
-		headerText: "MaxCombo",
-		dataIndex: "combo", 
-	},
-	{
-		headerText: "ノート数",
-		dataIndex: "noteCount", 
-	},
-	{
-		headerText: "判定達成率",
-		dataIndex: "judgeRate", 
-		format: '0%',
-	},
-	{
-		headerText: "コンボ達成率",
-		dataIndex: "comboRate", 
-		format: '0%',
-	},
-	{
-		headerText: "Grd",
-		dataIndex: "grade", 
-		type: 'n',
-		format: '0.00',
-	},
-	{
-		headerText: "Grd対象",
-		dataIndex: "grdTarget", 
-	},
-	{
-		headerText: "Grd期待値",
-		dataIndex: "nobiGrade", 
-		type: 'n',
-		format: '0.00',
-	},
-	{
-		headerText: "Grd伸び期待値",
-		dataIndex: "nobi", 
-		type: 'n',
-		format: '0.00',
-	},
-	{
-		headerText: "更新日時",
-		dataIndex: "datetime", 
-		type: 'd',
-		format: 'm/d',
-	},
+		title: "追加情報",
+		bgColor: "FF0000FF",
+		columns: [
+			{
+				headerText: "Grd期待値",
+				dataIndex: "nobiGrade", 
+				type: 'n',
+				format: '0.00',
+			},
+			{
+				headerText: "Grd伸び期待値",
+				dataIndex: "nobi", 
+				type: 'n',
+				format: '0.00',
+			},
+		]
+	}
 ];
 
 // 「グレード表を作成」ボタンが押された
@@ -308,18 +332,29 @@ function onClickCreatingGradeList() {
 
 			// 2次元配列に変換
 			var tableAry = $.map(resultList, function(r) {
-				var row = $.map(COL_DEFINE, function(col) {
-					return r[col.dataIndex];
+				var row = $.map(COL_DEFINE, function(group) {
+					var col = $.map(group.columns, function(c) {
+						return r[c.dataIndex];
+					});
+					return col;
 				});
 				return [row]; // さらに配列で包まないと1次元配列になってしまう
 			});
 
 			// ヘッダー行作成
-			var header = $.map(COL_DEFINE, function(col) {
-				return col.headerText;
+			var line1 = [];
+			var line2 = [];
+			$.each(COL_DEFINE, function(gIdx, group) {
+
+				$.each(group.columns, function(cIdx, column) {
+					if (cIdx == 0) line1.push(group.title);
+					else line1.push("");
+
+					line2.push(column.headerText);
+				});
 			});
 
-			tableAry.unshift(header);
+			tableAry.unshift(line1, line2);
 
 			tableAry[0].push('');
 			tableAry[0].push('下限Grd');
@@ -329,17 +364,22 @@ function onClickCreatingGradeList() {
 
 			var endRow = XLSX.utils.decode_range(ws["!ref"]).e.r;
 
-			$.each(COL_DEFINE, function(colNo) {
-				for (var rowNo = 1; rowNo <= endRow; rowNo++) {
-					var cellRef = XLSX.utils.encode_cell({c:colNo, r:rowNo})
-					var cell = ws[cellRef];
-
-					var type = this.type;
-					var fmt = this.format;
-
-					if (type) cell.t = type;
-					if (fmt) cell.z = fmt;
-				}
+			var colNo = 0;
+			$.each(COL_DEFINE, function() {
+				var group = this;
+				$.each(group.columns, function() {
+					for (var rowNo = 2; rowNo <= endRow; rowNo++) {
+						var cellRef = XLSX.utils.encode_cell({c:colNo, r:rowNo})
+						var cell = ws[cellRef];
+	
+						var type = this.type;
+						var fmt = this.format;
+	
+						if (type) cell.t = type;
+						if (fmt) cell.z = fmt;
+					}
+					colNo++;
+				});
 			});
 
 			ws['!autofilter'] = {
