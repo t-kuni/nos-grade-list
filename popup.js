@@ -147,6 +147,10 @@ const COL_DEFINE = [
 				dataIndex: "title", 
 			},
 			{
+				headerText: "難易度",
+				dataIndex: "difficulty", 
+			},
+			{
 				headerText: "レベル",
 				dataIndex: "level", 
 			},
@@ -163,6 +167,10 @@ const COL_DEFINE = [
 			{
 				headerText: "ランク",
 				dataIndex: "rank", 
+			},
+			{
+				headerText: "フルコン",
+				dataIndex: "fc", 
 			},
 			{
 				headerText: "Miss",
@@ -191,6 +199,73 @@ const COL_DEFINE = [
 		]
 	},
 	{
+		title: "音符別成功率",
+		bgColor: "FF0000FF",
+		columns: [
+			{
+				headerText: "スタンダード",
+				dataIndex: "standardRate", 
+				hookMakeCell: function(cell) {
+					if (cell.v != '-') {
+						cell.z = '0.0%';
+						cell.t = 'n';
+					}
+				}
+			},
+			{
+				headerText: "テヌート",
+				dataIndex: "tenutoRate", 
+				hookMakeCell: function(cell) {
+					if (cell.v != '-') {
+						cell.z = '0.0%';
+						cell.t = 'n';
+					}
+				}
+			},
+			{
+				headerText: "グリッサンド",
+				dataIndex: "glissandoRate", 
+				hookMakeCell: function(cell) {
+					if (cell.v != '-') {
+						cell.z = '0.0%';
+						cell.t = 'n';
+					}
+				}
+			},
+			{
+				headerText: "トリル",
+				dataIndex: "trillRate", 
+				hookMakeCell: function(cell) {
+					if (cell.v != '-') {
+						cell.z = '0.0%';
+						cell.t = 'n';
+					}
+				}
+			},
+		]
+	},
+	{
+		title: "累計データ",
+		bgColor: "FF00FFFF",
+		columns: [
+			{
+				headerText: "演奏回数",
+				dataIndex: "playCount", 
+				type: 'n',
+			},
+			{
+				headerText: "Full Combo回数",
+				dataIndex: "fcCount", 
+				type: 'n',
+			},
+			{
+				headerText: "Perfect回数",
+				dataIndex: "pianisticCount", 
+				type: 'n',
+			},
+		]
+	},
+	{
 		title: "追加情報",
 		bgColor: "FF00FF00",
 		columns: [
@@ -211,7 +286,7 @@ const COL_DEFINE = [
 		]
 	},
 	{
-		title: "追加情報",
+		title: "その他",
 		bgColor: "FF0000FF",
 		columns: [
 			{
@@ -229,6 +304,24 @@ const COL_DEFINE = [
 		]
 	}
 ];
+
+function eachColDefine(cb) {
+	var colNo = 0;
+	$.each(COL_DEFINE, function(gIdx, group) {
+		$.each(group.columns, function(cIdx, column) {
+			cb(gIdx, group, cIdx, column, colNo);
+			colNo++;
+		});
+	});
+}
+
+function getColDefCount() {
+	var cnt = 0;
+	$.each(COL_DEFINE, function(gIdx, group) {
+		cnt += group.columns.length;
+	});
+	return cnt;
+}
 
 // 「グレード表を作成」ボタンが押された
 function onClickCreatingGradeList() {
@@ -364,32 +457,29 @@ function onClickCreatingGradeList() {
 
 			var endRow = XLSX.utils.decode_range(ws["!ref"]).e.r;
 
-			var colNo = 0;
-			$.each(COL_DEFINE, function() {
-				var group = this;
-				var bgColor = group.bgColor;
-				$.each(group.columns, function() {
+			eachColDefine(function(gIdx, group, cIdx, column, colNo) {
 
-					// ヘッダー部分を処理
-					for (var rowNo = 0; rowNo < 2; rowNo++) {
-						var cellRef = XLSX.utils.encode_cell({c:colNo, r:rowNo});
-						var cell = ws[cellRef];
-						cell.bg = bgColor;
-					}
+				// ヘッダー部分を処理
+				for (var rowNo = 0; rowNo < 2; rowNo++) {
+					var cellRef = XLSX.utils.encode_cell({c:colNo, r:rowNo});
+					var cell = ws[cellRef];
+					cell.bg = group.bgColor;
+				}
 
-					// ボディ部分を処理
-					for (var rowNo = 2; rowNo <= endRow; rowNo++) {
-						var cellRef = XLSX.utils.encode_cell({c:colNo, r:rowNo});
-						var cell = ws[cellRef];
-	
-						var type = this.type;
-						var fmt = this.format;
-	
-						if (type) cell.t = type;
-						if (fmt) cell.z = fmt;
-					}
-					colNo++;
-				});
+				// ボディ部分を処理
+				for (var rowNo = 2; rowNo <= endRow; rowNo++) {
+					var cellRef = XLSX.utils.encode_cell({c:colNo, r:rowNo});
+					var cell = ws[cellRef];
+
+					var type = column.type;
+					var fmt = column.format;
+
+					if (type) cell.t = type;
+					if (fmt) cell.z = fmt;
+
+					if (column.hookMakeCell != undefined) 
+						column.hookMakeCell(cell);
+				}
 			});
 
 			ws['!autofilter'] = {
@@ -399,7 +489,7 @@ function onClickCreatingGradeList() {
 						r: 1,
 					},
 					e: {
-						c: COL_DEFINE.length - 1,
+						c: getColDefCount() - 1,
 						r: 1,
 					}
 				})

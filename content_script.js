@@ -6,6 +6,11 @@ const DIFFICULTY_LIST = [
 	HARD,
 	EXPERT
 ];
+const DIFFICULTY_TEXTS = [
+	"Normal",
+	'Hard',
+	'Expert'
+]
 
 function getScore(seq, difficulty, key) {
 	return $("[data-pdataMap~='music_list.music[" + seq + "].sheet[" + difficulty + "]." + key + "']").attr("data-pdataval");
@@ -62,6 +67,18 @@ const SCORE_CONFIG = {
 	},
 	fc_type: {
 		name: "fc",
+		filter: function(value) {
+			switch (value) {
+				case '0':
+					return "";
+				case '1':
+					return "NF";
+				case '2':
+					return "F";
+				default:
+					return "";
+			}
+		}
 	},
 	fullcombo_count: {
 		name: "fcCount",
@@ -89,15 +106,27 @@ const SCORE_CONFIG = {
 	},
 	notes_glissando_rate: {
 		name: "glissandoRate",
+		filter: function(value) {
+			return parseRate(value);
+		}
 	},
 	notes_standard_rate: {
 		name: "standardRate",
+		filter: function(value) {
+			return parseRate(value);
+		}
 	},
 	notes_tenuto_rate: {
 		name: "tenutoRate",
+		filter: function(value) {
+			return parseRate(value);
+		}
 	},
 	notes_trill_rate: {
 		name: "trillRate",
+		filter: function(value) {
+			return parseRate(value);
+		}
 	},
 	pianistic_count: {
 		name: "pianisticCount",
@@ -114,6 +143,20 @@ const SCORE_CONFIG = {
 	rank: {
 		name: "rank",
 	},
+}
+
+function parseRate(value) {
+	var matched = value.match(/^(\d+)\.(\d)%$/);
+	if (matched) {
+		// パーセント表記から実数表記に変換する
+		var int = matched[1];
+		var dec = matched[2];	
+		var real = ('0000' + int + dec).slice(-4); // 0埋め
+		real = insertStr(real, 1, '.'); // 少数点を入れる
+		return real;
+	} else {
+		return "-";
+	}
 }
 
 function getScores(seq, difficulty) {
@@ -157,7 +200,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 			var result = $.extend(scores, {
 				seq: seq,
 				title: title,
-				difficulty: difficulty,
+				difficulty: DIFFICULTY_TEXTS[difficulty],
 			});
 		
 			resultList.push(result);
