@@ -136,7 +136,7 @@ const RANK_RATE = {
 const COL_DEFINE = [
 	{
 		title: "曲情報",
-		bgColor: "FFFF0000",
+		bgColor: "FFFDE9D9",
 		columns: [
 			{
 				headerText: "番号",
@@ -158,7 +158,7 @@ const COL_DEFINE = [
 	},
 	{
 		title: "ベストスコア",
-		bgColor: "FFFFFF00",
+		bgColor: "FFDAEEF3",
 		columns: [
 			{
 				headerText: "スコア",
@@ -173,34 +173,59 @@ const COL_DEFINE = [
 				dataIndex: "fc", 
 			},
 			{
+				headerText: "◆Just",
+				dataIndex: "sjust", 
+				bgColor: 'FFE4DFEC',
+			},
+			{
+				headerText: "Just",
+				dataIndex: "just", 
+				bgColor: 'FFE4DFEC',
+			},
+			{
+				headerText: "Good",
+				dataIndex: "good", 
+				bgColor: 'FFE4DFEC',
+			},
+			{
+				headerText: "Near",
+				dataIndex: "near", 
+				bgColor: 'FFE4DFEC',
+			},
+			{
 				headerText: "Miss",
 				dataIndex: "miss", 
+				bgColor: 'FFE4DFEC',
 			},
 			{
 				headerText: "MaxCombo",
 				dataIndex: "combo", 
+				bgColor: 'FFEBF1DE',
 			},
 			{
 				headerText: "ノート数",
 				dataIndex: "noteCount", 
+				bgColor: 'FFEBF1DE',
 			},
 			{
 				headerText: "Grd",
 				dataIndex: "grade", 
 				type: 'n',
 				format: '0.00',
+				bgColor: 'FFEBF1DE',
 			},
 			{
 				headerText: "更新日時",
 				dataIndex: "datetime", 
 				type: 'd',
 				format: 'm/d',
+				bgColor: 'FFFDE9D9',
 			},
 		]
 	},
 	{
 		title: "音符別成功率",
-		bgColor: "FF0000FF",
+		bgColor: "FFC5D9F1",
 		columns: [
 			{
 				headerText: "スタンダード",
@@ -246,7 +271,7 @@ const COL_DEFINE = [
 	},
 	{
 		title: "累計データ",
-		bgColor: "FF00FFFF",
+		bgColor: "FFFDE9D9",
 		columns: [
 			{
 				headerText: "演奏回数",
@@ -267,7 +292,7 @@ const COL_DEFINE = [
 	},
 	{
 		title: "追加情報",
-		bgColor: "FF00FF00",
+		bgColor: "FFF2DCDB",
 		columns: [
 			{
 				headerText: "判定達成率",
@@ -287,7 +312,7 @@ const COL_DEFINE = [
 	},
 	{
 		title: "その他",
-		bgColor: "FF0000FF",
+		bgColor: "FFDDD9C4",
 		columns: [
 			{
 				headerText: "Grd期待値",
@@ -321,6 +346,14 @@ function getColDefCount() {
 		cnt += group.columns.length;
 	});
 	return cnt;
+}
+
+function makeGroupHeaderBorder(cIdx, colCnt) {
+	var top = '1';
+	var bottom = '1';
+	var left = cIdx == 0 ? '1' : '0';
+	var right = cIdx == colCnt - 1 ? '1' : '0';
+	return [top, right, bottom, left].join(' ');
 }
 
 // 「グレード表を作成」ボタンが押された
@@ -463,13 +496,24 @@ function onClickCreatingGradeList() {
 				for (var rowNo = 0; rowNo < 2; rowNo++) {
 					var cellRef = XLSX.utils.encode_cell({c:colNo, r:rowNo});
 					var cell = ws[cellRef];
-					cell.bg = group.bgColor;
+
+					if (rowNo == 0) {
+						cell.border = makeGroupHeaderBorder(cIdx, group.columns.length);
+						cell.bg = group.bgColor;
+					} else {
+						cell.border = '1 1 1 1';
+						cell.bg = group.bgColor;
+						if (column.bgColor != undefined)
+							cell.bg = column.bgColor;
+					}
 				}
 
 				// ボディ部分を処理
 				for (var rowNo = 2; rowNo <= endRow; rowNo++) {
 					var cellRef = XLSX.utils.encode_cell({c:colNo, r:rowNo});
 					var cell = ws[cellRef];
+
+					cell.border = '1 1 1 1';
 
 					var type = column.type;
 					var fmt = column.format;
