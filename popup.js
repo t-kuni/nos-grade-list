@@ -141,18 +141,21 @@ const COL_DEFINE = [
 			{
 				headerText: "番号",
 				dataIndex: "seq", 
+				hidable: false,
 			},
 			{
 				headerText: "曲名",
 				dataIndex: "title", 
+				hidable: false,
 			},
 			{
 				headerText: "難易度",
 				dataIndex: "difficulty", 
+				hidable: false,
 			},
 			{
 				headerText: "レベル",
-				dataIndex: "level", 
+				dataIndex: "level",
 			},
 		]
 	},
@@ -333,11 +336,28 @@ const COL_DEFINE = [
 function eachColDefine(cb) {
 	var colNo = 0;
 	$.each(COL_DEFINE, function(gIdx, group) {
-		$.each(group.columns, function(cIdx, column) {
+		var cIdx = 0;
+		$.each(group.columns, function(__dummy, column) {
+			if (!isNeededToShow(column))
+				return;
+
 			cb(gIdx, group, cIdx, column, colNo);
+			cIdx++;
 			colNo++;
 		});
 	});
+}
+
+/**
+ * 該当のカラムが出力が必要か調べる
+ */
+function isNeededToShow(column) {
+	if (column.hidable == undefined || column.hidable == true) {
+		var key = camelToKebab(column.dataIndex);
+		return getColSetting(key);
+	} else {
+		return true;
+	}
 }
 
 function getColDefCount() {
@@ -354,6 +374,32 @@ function makeGroupHeaderBorder(cIdx, colCnt) {
 	var left = cIdx == 0 ? '1' : '0';
 	var right = cIdx == colCnt - 1 ? '1' : '0';
 	return [top, right, bottom, left].join(' ');
+}
+
+// ケバブケース（ハイフン区切り）を
+// キャメルケースに変換する
+var kebabToCamel = function(p){
+	return p.replace(/-./g,
+		function(s) {
+			return s.charAt(1).toUpperCase();
+		}
+	);
+};
+
+/**
+ * キャメルケースをケバブケース（ハイフン区切り）に変換する
+ */
+var camelToKebab = function(p){
+	//大文字を_+小文字にする(例:A を _a)
+	return p.replace(/([A-Z])/g,
+		function(s) {
+			return '-' + s.charAt(0).toLowerCase();
+		}
+	);
+};
+
+function getColSetting(key) {
+	return $("#col-setting-" + key).prop("checked");
 }
 
 // 「グレード表を作成」ボタンが押された
@@ -460,6 +506,13 @@ function onClickCreatingGradeList() {
 			var tableAry = $.map(resultList, function(r) {
 				var row = $.map(COL_DEFINE, function(group) {
 					var col = $.map(group.columns, function(c) {
+						if (c.hidable == undefined || c.hidable == true) {
+							var key = camelToKebab(c.dataIndex);
+							var isShown = getColSetting(key);
+							if (!isShown) {
+								return null;
+							}
+						}
 						return r[c.dataIndex];
 					});
 					return col;
@@ -470,14 +523,11 @@ function onClickCreatingGradeList() {
 			// ヘッダー行作成
 			var line1 = [];
 			var line2 = [];
-			$.each(COL_DEFINE, function(gIdx, group) {
-				
-				$.each(group.columns, function(cIdx, column) {
-					if (cIdx == 0) line1.push(group.title);
-					else line1.push("");
+			eachColDefine(function(gIdx, group, cIdx, column, colNo) {
+				if (cIdx == 0) line1.push(group.title);
+				else line1.push("");
 
-					line2.push(column.headerText);
-				});
+				line2.push(column.headerText);
 			});
 
 			tableAry.unshift(line1, line2);
