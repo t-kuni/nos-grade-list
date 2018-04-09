@@ -539,6 +539,8 @@ function onClickCreatingGradeList() {
 				})
 			};
 
+			decorateMinGrade(ws);
+
 			var wb = XLSX.utils.book_new();
 			var wsName = "グレード表";
 			wb.SheetNames.push(wsName);
@@ -551,6 +553,17 @@ function onClickCreatingGradeList() {
 		});
 	});
 }
+
+// 下限グレードの見栄えを設定する
+function decorateMinGrade(ws) {
+	var endCol = XLSX.utils.decode_range(ws["!ref"]).e.c;
+	var headCell = ws[XLSX.utils.encode_cell({c: endCol - 1, r: 0})];
+	var bodyCell = ws[XLSX.utils.encode_cell({c: endCol, r: 0})];
+	headCell.bg = "FFC5D9F1";
+	headCell.border = '1 1 1 1';
+	bodyCell.border = '1 1 1 1';
+}	
+
 
 // ミス数が2減った時のコンボ達成率を取得します
 function calcIncComboRate(miss, comboRate) {
