@@ -20,6 +20,7 @@
   ],
   "permissions": [
     "https://p.eagate.573.jp/game/nostalgia/nst/playdata/entrance.html?k=music_data",
-    "downloads"
+    "downloads",
+    "cookies"
   ]
 }

@@ -7,8 +7,8 @@
 <html>
   <head>
     <title>Getting Started Extension's Popup</title>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     <!--
       - JavaScript and HTML must be in separate files: see our Content Security
@@ -16,11 +16,11 @@
       -
       - [1]: https://developer.chrome.com/extensions/contentSecurityPolicy
     -->
-	<script src="jquery-3.3.1.min.js"></script>
-	<script src="crypto-js.js"></script>
-	<link rel="stylesheet" href="bootstrap.min.css">
-	<script src="bootstrap.min.js"></script>
-  <script src="jszip.js"></script>
+    <script src="jquery-3.3.1.min.js"></script>
+    <script src="crypto-js.js"></script>
+    <link rel="stylesheet" href="bootstrap.min.css">
+    <script src="bootstrap.min.js"></script>
+    <script src="jszip.js"></script>
     <script src="xlsx.js"></script>
     <script src="popup.js"></script>	
   </head>
@@ -31,159 +31,161 @@
     <h6 class=" mb-2 text-muted">ノスタルジアのグレード表(エクセル)を作成するツールです。</h6>
     
     
-    <div>
-      <button class="btn btn-link" data-toggle="collapse" data-target="#col-setting-form">
-        出力列設定
-      </button>
-    </div>
-    
-    <div id="col-setting-form" class="collapse">
+    <div id="settings">
       <div>
-        <button class="btn btn-link" id="choice-all">
-          全選択
-        </button>
-        <button class="btn btn-link" id="choice-recommended">
-          オススメ
-        </button>
-        <button class="btn btn-link" id="choice-clear">
-          全解除
+        <button class="btn btn-link" data-toggle="collapse" data-target="#col-setting-form">
+          出力列設定
         </button>
       </div>
-      <form id="choices-area">
-        <div class="form-group">
-          <div>難易度</div> 
-          <div class="form-check form-check-inline">
-            <input class="form-check-input" type="checkbox" checked="checked" id="col-setting-difficulty-normal" value="option1">
-            <label class="form-check-label" for="col-setting-difficulty-normal">Normal</label>
-          </div>
-          <div class="form-check form-check-inline">
-            <input class="form-check-input" type="checkbox" checked="checked" id="col-setting-difficulty-hard" value="option2">
-            <label class="form-check-label" for="col-setting-difficulty-hard">Hard</label>
-          </div>
-          <div class="form-check form-check-inline">
-            <input class="form-check-input" type="checkbox" checked="checked" id="col-setting-difficulty-expert" value="option2">
-            <label class="form-check-label" for="col-setting-difficulty-expert">Expert</label>
-          </div>
+      
+      <div id="col-setting-form" class="collapse">
+        <div>
+          <button class="btn btn-link" id="choice-all">
+            全選択
+          </button>
+          <button class="btn btn-link" id="choice-recommended">
+            オススメ
+          </button>
+          <button class="btn btn-link" id="choice-clear">
+            全解除
+          </button>
         </div>
-        <div class="form-group">
-          <div>曲情報</div> 
-          <div class="form-check form-check-inline">
-            <input class="form-check-input" type="checkbox" checked="checked" id="col-setting-level" value="option1">
-            <label class="form-check-label" for="col-setting-level">レベル</label>
+        <form id="choices-area">
+          <div class="form-group">
+            <div>難易度</div> 
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="checkbox" checked="checked" id="col-setting-difficulty-normal" value="option1">
+              <label class="form-check-label" for="col-setting-difficulty-normal">Normal</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="checkbox" checked="checked" id="col-setting-difficulty-hard" value="option2">
+              <label class="form-check-label" for="col-setting-difficulty-hard">Hard</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="checkbox" checked="checked" id="col-setting-difficulty-expert" value="option2">
+              <label class="form-check-label" for="col-setting-difficulty-expert">Expert</label>
+            </div>
           </div>
-        </div>
-        <div class="form-group">
-          <div>ベストスコア</div> 
-          <div class="form-check form-check-inline">
-            <input class="form-check-input" type="checkbox" checked="checked" id="col-setting-score" value="option1">
-            <label class="form-check-label" for="col-setting-score">スコア</label>
+          <div class="form-group">
+            <div>曲情報</div> 
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="checkbox" checked="checked" id="col-setting-level" value="option1">
+              <label class="form-check-label" for="col-setting-level">レベル</label>
+            </div>
           </div>
-          <div class="form-check form-check-inline">
-            <input class="form-check-input" type="checkbox" checked="checked" id="col-setting-rank" value="option1">
-            <label class="form-check-label" for="col-setting-rank">ランク</label>
+          <div class="form-group">
+            <div>ベストスコア</div> 
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="checkbox" checked="checked" id="col-setting-score" value="option1">
+              <label class="form-check-label" for="col-setting-score">スコア</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="checkbox" checked="checked" id="col-setting-rank" value="option1">
+              <label class="form-check-label" for="col-setting-rank">ランク</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="checkbox" checked="checked" id="col-setting-fc" value="option1">
+              <label class="form-check-label" for="col-setting-fc">フルコン</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="checkbox" checked="checked" id="col-setting-sjust" value="option1">
+              <label class="form-check-label" for="col-setting-sjust">◆Just</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="checkbox" checked="checked" id="col-setting-just" value="option1">
+              <label class="form-check-label" for="col-setting-just">Just</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="checkbox" checked="checked" id="col-setting-good" value="option1">
+              <label class="form-check-label" for="col-setting-good">Good</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="checkbox" checked="checked" id="col-setting-near" value="option1">
+              <label class="form-check-label" for="col-setting-near">Near</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="checkbox" checked="checked" id="col-setting-miss" value="option1">
+              <label class="form-check-label" for="col-setting-miss">Miss</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="checkbox" checked="checked" id="col-setting-combo" value="option1">
+              <label class="form-check-label" for="col-setting-combo">MaxCombo</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="checkbox" checked="checked" id="col-setting-note-count" value="option1">
+              <label class="form-check-label" for="col-setting-note-count">ノート数</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="checkbox" checked="checked" id="col-setting-grade" value="option1">
+              <label class="form-check-label" for="col-setting-grade">Grd</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="checkbox" checked="checked" id="col-setting-datetime" value="option1">
+              <label class="form-check-label" for="col-setting-datetime">更新日時</label>
+            </div>
           </div>
-          <div class="form-check form-check-inline">
-            <input class="form-check-input" type="checkbox" checked="checked" id="col-setting-fc" value="option1">
-            <label class="form-check-label" for="col-setting-fc">フルコン</label>
+          <div class="form-group">
+            <div>音符別成功率</div> 
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="checkbox" checked="checked" id="col-setting-standard-rate" value="option1">
+              <label class="form-check-label" for="col-setting-standard-rate">スタンダード</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="checkbox" checked="checked" id="col-setting-tenuto-rate" value="option1">
+              <label class="form-check-label" for="col-setting-tenuto-rate">テヌート</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="checkbox" checked="checked" id="col-setting-glissando-rate" value="option1">
+              <label class="form-check-label" for="col-setting-glissando-rate">グリッサンド</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="checkbox" checked="checked" id="col-setting-trill-rate" value="option1">
+              <label class="form-check-label" for="col-setting-trill-rate">トリル</label>
+            </div>
           </div>
-          <div class="form-check form-check-inline">
-            <input class="form-check-input" type="checkbox" checked="checked" id="col-setting-sjust" value="option1">
-            <label class="form-check-label" for="col-setting-sjust">◆Just</label>
+          <div class="form-group">
+            <div>累計データ</div> 
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="checkbox" checked="checked" id="col-setting-play-count" value="option1">
+              <label class="form-check-label" for="col-setting-play-count">演奏回数</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="checkbox" checked="checked" id="col-setting-fc-count" value="option1">
+              <label class="form-check-label" for="col-setting-fc-count">FullCombo回数</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="checkbox" checked="checked" id="col-setting-pianistic-count" value="option1">
+              <label class="form-check-label" for="col-setting-pianistic-count">Perfect回数</label>
+            </div>
           </div>
-          <div class="form-check form-check-inline">
-            <input class="form-check-input" type="checkbox" checked="checked" id="col-setting-just" value="option1">
-            <label class="form-check-label" for="col-setting-just">Just</label>
+          <div class="form-group">
+            <div>追加情報</div> 
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="checkbox" checked="checked" id="col-setting-judge-rate" value="option1">
+              <label class="form-check-label" for="col-setting-judge-rate">判定達成率</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="checkbox" checked="checked" id="col-setting-combo-rate" value="option1">
+              <label class="form-check-label" for="col-setting-combo-rate">コンボ達成率</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="checkbox" checked="checked" id="col-setting-grd-target" value="option1">
+              <label class="form-check-label" for="col-setting-grd-target">Grd対象</label>
+            </div>
           </div>
-          <div class="form-check form-check-inline">
-            <input class="form-check-input" type="checkbox" checked="checked" id="col-setting-good" value="option1">
-            <label class="form-check-label" for="col-setting-good">Good</label>
+          <div class="form-group">
+            <div>その他</div> 
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="checkbox" checked="checked" id="col-setting-nobi-grade" value="option1">
+              <label class="form-check-label" for="col-setting-nobi-grade">Grd期待値</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="checkbox" checked="checked" id="col-setting-nobi" value="option1">
+              <label class="form-check-label" for="col-setting-nobi">Grd伸び期待値</label>
+            </div>
           </div>
-          <div class="form-check form-check-inline">
-            <input class="form-check-input" type="checkbox" checked="checked" id="col-setting-near" value="option1">
-            <label class="form-check-label" for="col-setting-near">Near</label>
-          </div>
-          <div class="form-check form-check-inline">
-            <input class="form-check-input" type="checkbox" checked="checked" id="col-setting-miss" value="option1">
-            <label class="form-check-label" for="col-setting-miss">Miss</label>
-          </div>
-          <div class="form-check form-check-inline">
-            <input class="form-check-input" type="checkbox" checked="checked" id="col-setting-combo" value="option1">
-            <label class="form-check-label" for="col-setting-combo">MaxCombo</label>
-          </div>
-          <div class="form-check form-check-inline">
-            <input class="form-check-input" type="checkbox" checked="checked" id="col-setting-note-count" value="option1">
-            <label class="form-check-label" for="col-setting-note-count">ノート数</label>
-          </div>
-          <div class="form-check form-check-inline">
-            <input class="form-check-input" type="checkbox" checked="checked" id="col-setting-grade" value="option1">
-            <label class="form-check-label" for="col-setting-grade">Grd</label>
-          </div>
-          <div class="form-check form-check-inline">
-            <input class="form-check-input" type="checkbox" checked="checked" id="col-setting-datetime" value="option1">
-            <label class="form-check-label" for="col-setting-datetime">更新日時</label>
-          </div>
-        </div>
-        <div class="form-group">
-          <div>音符別成功率</div> 
-          <div class="form-check form-check-inline">
-            <input class="form-check-input" type="checkbox" checked="checked" id="col-setting-standard-rate" value="option1">
-            <label class="form-check-label" for="col-setting-standard-rate">スタンダード</label>
-          </div>
-          <div class="form-check form-check-inline">
-            <input class="form-check-input" type="checkbox" checked="checked" id="col-setting-tenuto-rate" value="option1">
-            <label class="form-check-label" for="col-setting-tenuto-rate">テヌート</label>
-          </div>
-          <div class="form-check form-check-inline">
-            <input class="form-check-input" type="checkbox" checked="checked" id="col-setting-glissando-rate" value="option1">
-            <label class="form-check-label" for="col-setting-glissando-rate">グリッサンド</label>
-          </div>
-          <div class="form-check form-check-inline">
-            <input class="form-check-input" type="checkbox" checked="checked" id="col-setting-trill-rate" value="option1">
-            <label class="form-check-label" for="col-setting-trill-rate">トリル</label>
-          </div>
-        </div>
-        <div class="form-group">
-          <div>累計データ</div> 
-          <div class="form-check form-check-inline">
-            <input class="form-check-input" type="checkbox" checked="checked" id="col-setting-play-count" value="option1">
-            <label class="form-check-label" for="col-setting-play-count">演奏回数</label>
-          </div>
-          <div class="form-check form-check-inline">
-            <input class="form-check-input" type="checkbox" checked="checked" id="col-setting-fc-count" value="option1">
-            <label class="form-check-label" for="col-setting-fc-count">FullCombo回数</label>
-          </div>
-          <div class="form-check form-check-inline">
-            <input class="form-check-input" type="checkbox" checked="checked" id="col-setting-pianistic-count" value="option1">
-            <label class="form-check-label" for="col-setting-pianistic-count">Perfect回数</label>
-          </div>
-        </div>
-        <div class="form-group">
-          <div>追加情報</div> 
-          <div class="form-check form-check-inline">
-            <input class="form-check-input" type="checkbox" checked="checked" id="col-setting-judge-rate" value="option1">
-            <label class="form-check-label" for="col-setting-judge-rate">判定達成率</label>
-          </div>
-          <div class="form-check form-check-inline">
-            <input class="form-check-input" type="checkbox" checked="checked" id="col-setting-combo-rate" value="option1">
-            <label class="form-check-label" for="col-setting-combo-rate">コンボ達成率</label>
-          </div>
-          <div class="form-check form-check-inline">
-            <input class="form-check-input" type="checkbox" checked="checked" id="col-setting-grd-target" value="option1">
-            <label class="form-check-label" for="col-setting-grd-target">Grd対象</label>
-          </div>
-        </div>
-        <div class="form-group">
-          <div>その他</div> 
-          <div class="form-check form-check-inline">
-            <input class="form-check-input" type="checkbox" checked="checked" id="col-setting-nobi-grade" value="option1">
-            <label class="form-check-label" for="col-setting-nobi-grade">Grd期待値</label>
-          </div>
-          <div class="form-check form-check-inline">
-            <input class="form-check-input" type="checkbox" checked="checked" id="col-setting-nobi" value="option1">
-            <label class="form-check-label" for="col-setting-nobi">Grd伸び期待値</label>
-          </div>
-        </div>
-      </form>
+        </form>
+      </div>
     </div>
 		
     <button class="btn btn-primary" id="move-btn">楽曲データページを開く</button>

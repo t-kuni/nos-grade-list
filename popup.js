@@ -42,13 +42,19 @@ document.addEventListener('DOMContentLoaded', () => {
 	getCurrentTabUrl((url) => {
 		var $moveBtn = $('#move-btn');
 		var $createBtn = $('#create-btn');
+		var $settings = $("#settings");
 		
 		if (isMusicDataPage(url)) {
 			$moveBtn.hide();
 			$createBtn.show();
+			$settings.show();
+
+			// 設定を復元する
+			restoreSettings();
 		} else {
 			$moveBtn.show();
 			$createBtn.hide();
+			$settings.hide();
 		}
 		
 		$createBtn.click(onClickCreatingGradeList);
@@ -67,7 +73,7 @@ function onClickChoiceAll() {
 function onClickChoiceRecommended() {
 	// 先に全解除
 	onClickChoiceClear();
-	
+
 	var keys = [
 		"normal",
 		"hard",
@@ -451,11 +457,45 @@ function getColSetting(key) {
 	return getColSettingElem(key).prop("checked");
 }
 
+function storeSettings() {
+	var $inputs = $("#choices-area").find("input.form-check-input");
+	$inputs.each(function() {
+		var $input = $(this);
+		var value = $input.prop("checked");
+		var details = {
+			url: "https://p.eagate.573.jp/game/nostalgia/nst/playdata/entrance.html?k=music_data",
+			name: $input.attr("id"),
+			value: JSON.stringify(value),
+		};
+		chrome.cookies.set(details);
+	});
+}
+
+function restoreSettings() {
+	var $inputs = $("#choices-area").find("input.form-check-input");
+	$inputs.each(function() {
+		var $input = $(this);
+		var details = {
+			url: "https://p.eagate.573.jp/game/nostalgia/nst/playdata/entrance.html?k=music_data",
+			name: $input.attr("id")
+		};
+		var value = chrome.cookies.get(details, function(cookie) {
+			if (cookie != null) {
+				var value = JSON.parse(cookie.value);
+				$input.prop("checked", value);
+			}
+		});
+	});
+}
+
 // 「グレード表を作成」ボタンが押された
 function onClickCreatingGradeList() {
 	// UIを切り替え
 	$('#progress').show();
 	$('#create-btn').prop('disabled', true);
+
+	// 設定をクッキーに保存
+	storeSettings();
 
 	const COL_GRADE = 'K';
 	const COL_JUDGE_RATE = 'I';
