@@ -53,8 +53,49 @@ document.addEventListener('DOMContentLoaded', () => {
 		
 		$createBtn.click(onClickCreatingGradeList);
 		$moveBtn.click(() => {window.open('https://p.eagate.573.jp/game/nostalgia/nst/playdata/entrance.html?k=music_data');});
+
+		$("#choice-all").click(onClickChoiceAll);
+		$("#choice-recommended").click(onClickChoiceRecommended);
+		$("#choice-clear").click(onClickChoiceClear);
 	});
 });
+
+function onClickChoiceAll() {
+	$("#choices-area").find("input.form-check-input").prop("checked", true);
+}
+
+function onClickChoiceRecommended() {
+	// 先に全解除
+	onClickChoiceClear();
+	
+	var keys = [
+		"normal",
+		"hard",
+		"expert",
+		"level",
+		"score",
+		"rank",
+		"fc",
+		"miss",
+		"combo",
+		"note-count",
+		"grade",
+		"datetime",
+		"judge-rate",
+		"combo-rate",
+		"grd-target",
+		"nobi-grade",
+		"nobi",
+	];
+	$.each(keys, function() {
+		var key = this;
+		setColSetting(key, true);
+	});
+}
+
+function onClickChoiceClear() {
+	$("#choices-area").find("input.form-check-input").prop("checked", false);
+}
 
 /**
  * カラムのデータ形式を設定する
@@ -398,8 +439,16 @@ var camelToKebab = function(p){
 	);
 };
 
+function getColSettingElem(key) {
+	return $("#col-setting-" + key);
+}
+
+function setColSetting(key, value) {
+	getColSettingElem(key).prop("checked", value);
+}
+
 function getColSetting(key) {
-	return $("#col-setting-" + key).prop("checked");
+	return getColSettingElem(key).prop("checked");
 }
 
 // 「グレード表を作成」ボタンが押された
