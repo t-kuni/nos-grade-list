@@ -362,8 +362,8 @@ function isNeededToShow(column) {
 
 function getColDefCount() {
 	var cnt = 0;
-	$.each(COL_DEFINE, function(gIdx, group) {
-		cnt += group.columns.length;
+	eachColDefine(function() {
+		cnt++;
 	});
 	return cnt;
 }
