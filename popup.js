@@ -63,21 +63,23 @@ document.addEventListener('DOMContentLoaded', () => {
 		$("#choice-all").click(onClickChoiceAll);
 		$("#choice-recommended").click(onClickChoiceRecommended);
 		$("#choice-clear").click(onClickChoiceClear);
+		$("#col-settings-difficulty input.form-check-input").click(onClickColSettingsDifficulty);
 	});
 });
 
+// 全選択を押下
 function onClickChoiceAll() {
-	$("#choices-area").find("input.form-check-input").prop("checked", true);
+	var $inputs = $("#choices-area").find("input.form-check-input");
+	$inputs = $inputs.not("#col-settings-difficulty input.form-check-input"); // 難易度は除外
+	$inputs.prop("checked", true);
 }
 
+// オススメボタンを押下
 function onClickChoiceRecommended() {
 	// 先に全解除
 	onClickChoiceClear();
 
 	var keys = [
-		"normal",
-		"hard",
-		"expert",
 		"level",
 		"score",
 		"rank",
@@ -99,8 +101,26 @@ function onClickChoiceRecommended() {
 	});
 }
 
+// 全解除ボタンを押下
 function onClickChoiceClear() {
-	$("#choices-area").find("input.form-check-input").prop("checked", false);
+	var $inputs = $("#choices-area").find("input.form-check-input");
+	$inputs = $inputs.not("#col-settings-difficulty input.form-check-input"); // 難易度は除外
+	$inputs.prop("checked", false);
+}
+
+function onClickColSettingsDifficulty() {
+	var checkedCnt = 0;
+	var $inputs = $("#col-settings-difficulty input.form-check-input");
+	$inputs.each(function() {
+		if ($(this).prop("checked"))
+			checkedCnt++;
+	});
+	
+	// 最低１つはチェックさせる
+	// チェック押された後に呼び出されるので
+	// チェック数が0の場合のみfalseを返してチェックボタン解除を取り消す
+	if (checkedCnt == 0) 
+		return false;
 }
 
 /**
