@@ -611,6 +611,18 @@ function onClickCreatingGradeList() {
 				r.nobi = nobi;
 			});
 
+			// 出力対象の難易度以外を捨てる
+			resultList = $.grep(resultList, function(score) {
+				switch (score.difficulty) {
+					case 'Normal':
+						return getColSetting("difficulty-normal");
+					case 'Hard':
+						return getColSetting("difficulty-hard");
+					case 'Expert':
+						return getColSetting("difficulty-expert");
+				}
+			});
+
 			// 2次元配列に変換
 			var tableAry = $.map(resultList, function(r) {
 				var row = $.map(COL_DEFINE, function(group) {
