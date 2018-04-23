@@ -512,7 +512,6 @@ function restoreSettings() {
 
 // 「グレード表を作成」ボタンが押された
 function onClickCreatingGradeList() {
-	fetchAd();
 	// UIを切り替え
 	$('#progress').show();
 	$('#create-btn').prop('disabled', true);
