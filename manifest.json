@@ -4,7 +4,7 @@
   "name": "ノスタルジアグレード表作成ツール",
   "short_name": "グレード表作成ツール",
   "description": "ノスタルジアのグレード表を作成するツールです。公式サイトの楽曲データの情報を取得して作成します。",
-  "version": "1.9",
+  "version": "1.91",
   "author": "ウェル",
 
   "browser_action": {
@@ -20,6 +20,7 @@
   ],
   "permissions": [
     "https://p.eagate.573.jp/game/nostalgia/nst/playdata/entrance.html?k=music_data",
+    "https://0fjpoc2vp1.execute-api.us-east-2.amazonaws.com/getProductAdvertising/getProductAdvertising",
     "downloads",
     "cookies"
   ]
