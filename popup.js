@@ -770,7 +770,7 @@ function isMusicDataPage(url) {
 	return url && url.match(/(p\.eagate\.573\.jp).*(entrance\.html\?k=music_data)/);
 }
 
-const AD_URL = "https://0fjpoc2vp1.execute-api.us-east-2.amazonaws.com/getProductAdvertising/getProductAdvertising";
+const AD_URL = "https://0fjpoc2vp1.execute-api.us-east-2.amazonaws.com/prod/getProductAdvertising";
 
 function fetchAd() {
 	$.ajax({
