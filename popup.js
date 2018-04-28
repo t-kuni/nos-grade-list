@@ -718,7 +718,7 @@ function onClickCreatingGradeList() {
 			var wsName = "グレード表";
 			wb.SheetNames.push(wsName);
 			wb.Sheets[wsName] = ws;
-			XLSX.writeFile(wb, 'greads.xlsx');
+			XLSX.writeFile(wb, 'grade.xlsx');
 
 			// UIを切り替え
 			$('#progress').hide();
