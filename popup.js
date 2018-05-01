@@ -480,7 +480,7 @@ function getColSetting(key) {
 }
 
 function storeSettings() {
-	var $inputs = $("#choices-area").find("input.form-check-input");
+	var $inputs = $("#choices-area").find("input.form-check-input, input[type='radio']");
 	$inputs.each(function() {
 		var $input = $(this);
 		var value = $input.prop("checked");
@@ -494,7 +494,7 @@ function storeSettings() {
 }
 
 function restoreSettings() {
-	var $inputs = $("#choices-area").find("input.form-check-input");
+	var $inputs = $("#choices-area").find("input.form-check-input, input[type='radio']");
 	$inputs.each(function() {
 		var $input = $(this);
 		var details = {
@@ -504,10 +504,31 @@ function restoreSettings() {
 		var value = chrome.cookies.get(details, function(cookie) {
 			if (cookie != null) {
 				var value = JSON.parse(cookie.value);
-				$input.prop("checked", value);
+				if ($input.attr('type') == 'radio' && value) {
+					$input.closest('.btn').button('toggle');
+				} else {
+					$input.prop("checked", value);
+				}
 			}
 		});
 	});
+}
+
+// ノート数を取得する
+function getNoteCount(r) {
+	return r.sjust + r.just + r.good + r.miss + r.near;
+}
+
+// フルコン済みならミス数を0にするオプションを考慮してミス数を調整する
+function adjustMiss(r) {
+	var onlyF = getColSetting("fc-is-miss-zero-only-f");
+	var both = getColSetting("fc-is-miss-zero-both");
+
+	if (onlyF && r.fc == "F" || both && r.fc != "") {
+		r.combo = getNoteCount(r);
+		r.good += r.miss; // missを減らす分、goodを増やす
+		r.miss = 0;
+	}
 }
 
 // 「グレード表を作成」ボタンが押された
@@ -540,14 +561,18 @@ function onClickCreatingGradeList() {
 			$.each(resultList, function(index) {
 				var r = this;
 
+				// ミス数を調整する
+				adjustMiss(r);
+
 				var sjust = r.sjust;
 				var just = r.just;
 				var good = r.good;
 				var miss = r.miss;
 				var near = r.near;
 				var combo = r.combo;
+				var fc = r.fc;
 
-				var noteCount = sjust + just + good + miss + near; // 総ノート数
+				var noteCount = getNoteCount(r); // 総ノート数
 				var judgeRate = noteCount > 0 ? (sjust + 0.5 * just + 0.25 * good) / noteCount : 0; // 判定達成率
 				var comboRate = noteCount > 0 ? combo / noteCount : 0; // コンボ達成率
 

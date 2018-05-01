@@ -184,6 +184,23 @@
               <label class="form-check-label" for="col-setting-nobi">Grd伸び期待値</label>
             </div>
           </div>
+          <div class="form-group">
+            <div>フルコン済みならmiss数0として扱う</div> 
+            <div class="btn-group btn-group-toggle" data-toggle="buttons">
+              <label class="btn btn-secondary active">
+                <input type="radio" name="options" id="col-setting-fc-is-miss-zero-off" autocomplete="off" checked>OFF
+              </label>
+              <label class="btn btn-secondary">
+                <input type="radio" name="options" id="col-setting-fc-is-miss-zero-only-f" autocomplete="off">Fのみ
+              </label>
+              <label class="btn btn-secondary">
+                <input type="radio" name="options" id="col-setting-fc-is-miss-zero-both" autocomplete="off">F,NF両方
+              </label>
+            </div>
+            <small id="passwordHelpBlock" class="form-text text-muted">
+              ※公式の楽曲データリストは、「フルコンしてもスコアが更新されなければMiss、Max Comboも更新されない」という仕様なので、フルコン済みなのにMiss数が0ではない譜面が発生します。<br />その対策のオプションです。<br />ミス数の少ない未フルコン譜面を探したいのにフルコン済み譜面が引っ掛かってきて邪魔！となったらお試しください。
+            </small>
+          </div>
         </form>
       </div>
     </div>
