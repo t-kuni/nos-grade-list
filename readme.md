@@ -15,11 +15,11 @@
 
 ## スクリーンショット
 
-![ss1](https://raw.githubusercontent.com/t-kuni/nos-grade-list/master/docs/ss1.png)
+![ss1](https://raw.githubusercontent.com/t-kuni/nos-grade-list/master/docs/ss1.png)  
 （chrome拡張を開いた時）
 
-![markie.png](https://raw.githubusercontent.com/t-kuni/nos-grade-list/master/work/markie.png?token=AB3WOUVJ6HRJNXGUFXHQWGC5ZXSEI)
+![markie.png](https://raw.githubusercontent.com/t-kuni/nos-grade-list/master/work/markie.png?token=AB3WOUVJ6HRJNXGUFXHQWGC5ZXSEI)  
 （出力されるグレード表）
 
-![ss1](https://raw.githubusercontent.com/t-kuni/nos-grade-list/master/docs/ss2.jpg)
+![ss1](https://raw.githubusercontent.com/t-kuni/nos-grade-list/master/docs/ss2.jpg)  
 （参考画像：ノスタルジアの実際のゲーム画面）
